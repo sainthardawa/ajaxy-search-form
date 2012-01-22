@@ -33,14 +33,6 @@ To disable the theme search form, go to /wp-content/themes/YOUR_THEME_NAME/ and 
 = 1.0 =
 * First version. Basic stable version.
 
-== Arbitrary section ==
-
-
-
-== A brief Markdown Example ==
-
-Ordered list:
-
 1. Search categories
 2. Search custom post types
 3. Templates customizable from backend
