@@ -357,4 +357,16 @@ add_action('wp_ajax_nopriv_ajaxy_sf', 'get_search_results');
 //FILTERS
 add_filter('get_search_form', 'ajaxy_search_form', 1);
 
+add_action( 'admin_notices', 'sf_admin_notice' );
+
+function sf_admin_notice()
+{
+	if(locate_template('searchform.php') != '')
+	{
+		global $current_screen;
+		if ( $current_screen->parent_base == 'options-general' )
+			  echo '<div style="padding: 5px 10px; background: #FFB; border: 1px solid yellow; margin: 10px 0;"><p><b>Warning</b> - the file <b>searchform.php</b> should be renamed or removed for this plugin to work (your theme uses its own search form), rename that file for this plugin to work<br/>To disable the theme search form, go to <b>/wp-content/themes/YOUR_THEME_NAME/</b> using your ftp client and rename <b>searchform.php</b> to searchforma.php, this will keep the file but remove its reference (in case you want to restore it back).<br/>In case you don\'t know how to, please email me to <a href="mailto:icu090@gmail.com">icu090@gmail.com</a> and i will do it for you.</p></div>';
+	}
+}
+
 ?>
