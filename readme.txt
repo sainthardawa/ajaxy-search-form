@@ -26,7 +26,7 @@ To disable the theme search form, go to /wp-content/themes/YOUR_THEME_NAME/ and 
 
 
 == Screenshots ==
-
+screenshot-1.png
 
 == Changelog ==
 
