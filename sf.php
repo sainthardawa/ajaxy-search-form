@@ -193,7 +193,6 @@ function ajaxy_search_form($form)
 	
 	</div>
 	</form>
-	<a style="display:none" href="http://ajaxy.org">Ajaxy.org</a>
 	';
 	$script = '<script type="text/javascript">
 				/* <![CDATA[ */
