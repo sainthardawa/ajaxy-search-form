@@ -33,6 +33,7 @@
 {
 	margin:0 !important;
 	list-style:none;
+	padding: 0 !important;
 }
 #sf_val ul li.sf_category a
 {
@@ -76,7 +77,7 @@
 	display:block;
 	min-height:50px;
 }
-#sf_val ul li.header
+#sf_val ul li.sf_header
 {
 	background:#eee;
 	padding:2px 15px 2px 6px;
@@ -96,6 +97,7 @@
 {
 	padding-bottom: 2px;
 	font-weight:bold;
+	text-align: left;
 }
 #sf_val li a span
 {
@@ -104,10 +106,12 @@
 #sf_val li .sf_small
 {
 	color:#666;
+	text-align: left;
 }
 #sf_val li.sf_more .sf_small
 {
 	font-size:9px;
+	text-align: center !important;
 }
 .sf_input, #s
 {

@@ -78,7 +78,7 @@ function sf_load(results)
 	{
 		if(results.all.length > 0)
 		{
-			m += "<li class=\"header\">" + results.title + "</li>";
+			m += "<li class=\"sf_header\">" + results.title + "</li>";
 			for(var i in results.all)
 			{
 				s ++;
