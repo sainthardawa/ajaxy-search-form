@@ -153,7 +153,7 @@ function sf_get_templates($template)
 		}
 		else
 		{
-			$template_post = '<a href="?s={search_value_escaped}">
+			$template_post = '<a href="/?s={search_value_escaped}">
 								<span class="sf_text">See more results for "{search_value}"</span>
 								<span class="sf_small">Displaying top {total} results</span>
 							</a>';
