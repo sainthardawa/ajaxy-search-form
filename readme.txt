@@ -1,6 +1,7 @@
 === Plugin Name ===
 Contributors: n-for-all
 Donate link: http://ajaxy.org/
+Version: 1.0.1
 Tags: facebook, live-search, ajax-search, category-search
 Requires at least: 3.0.0
 Tested up to: 3.3.0
@@ -26,7 +27,7 @@ To disable the theme search form, go to /wp-content/themes/YOUR_THEME_NAME/ and 
 
 
 == Screenshots ==
-screenshot-1.png
+1. screenshot-1.png
 
 == Changelog ==
 
