@@ -32,7 +32,7 @@ function sf_get_results()
 				sf_selected = " sf_selected";
 			}
 			m += "<li class=\"sf_lnk sf_more" + sf_selected + "\">" + sf_templates + "</li>";
-			m = m.replace(/{search_value_escaped}/g, escape(jQuery("#s").val()));
+			m = m.replace(/{search_value_escaped}/g, jQuery("#s").val());
 			m = m.replace(/{search_value}/g, jQuery("#s").val());
 			m = m.replace(/{total}/g, s);
 			if(s > 0)
