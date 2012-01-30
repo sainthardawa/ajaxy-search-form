@@ -147,21 +147,21 @@
 	display: inline-block;
 	height: 20px;
 }
-.sf_button
+.sf_button, #searchsubmit
 {
-	background-image: url("images/fb_search.png");
-	background-repeat: no-repeat;
-	background-position: 0px 0;
-	background-color: white;
-	border: 0;
-	cursor: pointer;
-	display: block;
-	height: 19px;
-	padding: 0;
-	position: absolute;
-	right: 4px;
-	top: 1px;
-	width: 22px;
+	background-image: url("images/fb_search.png") !important;
+	background-repeat: no-repeat !important;
+	background-position: 0px 0 !important;
+	background-color: white !important;
+	border: 0 !important; 
+	cursor: pointer !important;
+	display: block !important;
+	height: 19px !important;
+	padding: 0 !important;
+	position: absolute !important;
+	right: 4px !important;
+	top: 1px !important;
+	width: 22px !important;
 }
 .screen-reader-text
 {	
