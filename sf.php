@@ -177,7 +177,7 @@ function sf_get_templates($template)
 	return $template_post;
 }
 
-function ajaxy_search_form($form)
+function ajaxy_search_form($form = '')
 {
 	$width = sf_get_style_setting('width', 180);
 	$border = sf_get_style_setting('border-width', '1') . "px " . sf_get_style_setting('border-type', 'solid') . " #" . sf_get_style_setting('border-color', 'dddddd');

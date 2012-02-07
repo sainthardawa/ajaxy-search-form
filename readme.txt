@@ -5,7 +5,7 @@ Version: 1.0.1
 Tags: facebook, live-search, ajax-search, category-search
 Requires at least: 3.0.0
 Tested up to: 3.3.0
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 
 A facebook like ajaxy live search for wordpress
 
@@ -22,6 +22,8 @@ this plugin can search categories, post types and supports wp-ecommerce plugin
 3.(optional) if your theme uses a custom search form, then it should be disabled
 
 To disable the theme search form, go to /wp-content/themes/YOUR_THEME_NAME/ and rename searchform.php to searchforma.php, this will keep the file but remove its reference
+
+add a new function <?php echo ajaxy_search_form(); ?>, insert it into ur theme template
 
 == Frequently Asked Questions ==
 
