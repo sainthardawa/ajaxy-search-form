@@ -1,7 +1,7 @@
 === Plugin Name ===
 Contributors: n-for-all
 Donate link: http://ajaxy.org/
-Version: 1.0.1
+Version: 1.0.3
 Tags: facebook, live-search, ajax-search, category-search
 Requires at least: 3.0.0
 Tested up to: 3.3.0
