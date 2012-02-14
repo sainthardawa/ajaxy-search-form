@@ -217,16 +217,16 @@ function ajaxy_sf_category($name, $limit = 5)
 	global $wpdb;
 	$categories = array();
 	$setting = (object)sf_get_setting('category');
-	$results = $wpdb->get_results($wpdb->prepare("select $wpdb->terms.term_id from $wpdb->terms, $wpdb->term_taxonomy where name like '%%%s%%' and $wpdb->term_taxonomy.taxonomy='category' and $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id limit 0, ".$setting->limit,  $name));
+	$results = $wpdb->get_results($wpdb->prepare("select $wpdb->terms.term_id, $wpdb->term_taxonomy.taxonomy from $wpdb->terms, $wpdb->term_taxonomy where name like '%%%s%%' and $wpdb->term_taxonomy.taxonomy<>'link_category' and $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id limit 0, ".$setting->limit,  $name));
 	if(sizeof($results) > 0 && is_array($results) && !is_wp_error($results))
 	{
 		$unset_array = array('term_group', 'term_taxonomy_id', 'taxonomy', 'parent', 'count', 'cat_ID', 'cat_name', 'category_parent');
 		foreach($results as $result)
 		{
-			$cat = get_category($result->term_id);
-			if($cat != null)
+			$cat = get_term($result->term_id, $result->taxonomy);
+			if($cat != null && !is_wp_error($cat))
 			{
-				$category_link = get_category_link($result->term_id);
+				$category_link = get_term_link($cat);
 				$cat->category_link = $category_link;
 				foreach($unset_array as $uarr)
 				{

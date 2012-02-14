@@ -1,11 +1,11 @@
 === Plugin Name ===
 Contributors: n-for-all
 Donate link: http://ajaxy.org/
-Version: 1.0.3
+Version: 1.0.4
 Tags: facebook, live-search, ajax-search, category-search
 Requires at least: 3.0.0
 Tested up to: 3.3.0
-Stable tag: 1.0.3
+Stable tag: 1.0.4
 
 A facebook like ajaxy live search for wordpress, this plugin uses the same functionality as facebook to retrieve the results from your blog
 
@@ -32,6 +32,9 @@ add a new function <?php echo ajaxy_search_form(); ?>, insert it into ur theme t
 1. screenshot-1.png
 
 == Changelog ==
+
+= 1.0.4 =
+* Added Search post tags and custom taxonomy
 
 = 1.0.3 =
 * fixed some bugs with css to be compatible with all blogs
