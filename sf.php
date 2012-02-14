@@ -6,13 +6,13 @@
 	Plugin Name: Ajaxy Live Search
 	Plugin URI: http://ajaxy.org
 	Description: Transfer wordpress form into an advanced ajax search form the same as facebook live search
-	Version: 1.0.4
+	Version: 1.0.3
 	Author: Ajaxy Team
 	Author URI: http://ajaxy.org
 	License: GPLv2 or later
 */
 
-define('AJAXY_SF_VERSION', '1.0.4');
+define('AJAXY_SF_VERSION', '1.0.3');
 define('AJAXY_SF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define('AJAXY_SF_NO_IMAGE', plugin_dir_url( __FILE__ ) ."images/no-image.gif");
 
@@ -217,7 +217,7 @@ function ajaxy_sf_category($name, $limit = 5)
 	global $wpdb;
 	$categories = array();
 	$setting = (object)sf_get_setting('category');
-	$results = $wpdb->get_results($wpdb->prepare("select $wpdb->terms.term_id, $wpdb->term_taxonomy.taxonomy from $wpdb->terms, $wpdb->term_taxonomy where name like '%%%s%%' and $wpdb->term_taxonomy.taxonomy<>'link_category' and $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id limit 0, ".$setting->limit,  $name));
+	$results = $wpdb->get_results($wpdb->prepare("select distinct($wpdb->terms.name), $wpdb->terms.term_id,  $wpdb->term_taxonomy.taxonomy from $wpdb->terms, $wpdb->term_taxonomy where name like '%%%s%%' and $wpdb->term_taxonomy.taxonomy<>'link_category' and $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id limit 0, ".$setting->limit,  $name));
 	if(sizeof($results) > 0 && is_array($results) && !is_wp_error($results))
 	{
 		$unset_array = array('term_group', 'term_taxonomy_id', 'taxonomy', 'parent', 'count', 'cat_ID', 'cat_name', 'category_parent');
