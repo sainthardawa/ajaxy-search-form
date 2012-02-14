@@ -19,6 +19,10 @@
 	font-weight:bold;	
 	line-height:12px;
 }
+.sf_more .sf_text, .sf_more .sf_small
+{
+	text-align:center !important;
+}
 .sf_more img
 {	
 	padding:10px 0;
@@ -124,6 +128,7 @@
 	-moz-box-shadow:0 0 0 0 !important;
 	box-shadow:0 0 0 0 !important;
 	height:17px !important;
+	color:#000 !important;
 }
 .sf_input:focus, #s:focus
 {	

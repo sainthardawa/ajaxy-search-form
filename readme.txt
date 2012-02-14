@@ -5,7 +5,7 @@ Version: 1.0.1
 Tags: facebook, live-search, ajax-search, category-search
 Requires at least: 3.0.0
 Tested up to: 3.3.0
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 
 A facebook like ajaxy live search for wordpress
 
@@ -32,6 +32,9 @@ add a new function <?php echo ajaxy_search_form(); ?>, insert it into ur theme t
 1. screenshot-1.png
 
 == Changelog ==
+
+= 1.0.3 =
+* fixed some bugs with css to be compatible with all blogs
 
 = 1.0.1 =
 * fixed some bugs with css
