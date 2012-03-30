@@ -25,7 +25,7 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 	$AjaxyLiveSearch->set_style_setting('results_width'	, (int)$styles['results_width']); 
 	$AjaxyLiveSearch->set_style_setting('excerpt' 		, $styles['excerpt']);
 	$AjaxyLiveSearch->set_style_setting('css'			, $styles['css']);
-	$AjaxyLiveSearch->set_style_setting('results_position'	, $styles['results_position']);
+	//$AjaxyLiveSearch->set_style_setting('results_position'	, $styles['results_position']);
 	$AjaxyLiveSearch->set_style_setting('thumb_width'	, $styles['thumb_width']);
 	$AjaxyLiveSearch->set_style_setting('thumb_height'	, $styles['thumb_height']);
 	$message = "Settings saved";
