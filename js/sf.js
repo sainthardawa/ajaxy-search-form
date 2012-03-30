@@ -1,16 +1,58 @@
-jQuery(document).click(function(){ jQuery("#sf_results").hide(); });
-function sf_get_results()
+jQuery(document).click(function(){ jQuery("#sf_sb").hide(); });
+jQuery(document).ready(function(){
+	jQuery(".sf_input").focus(function (){
+		if(jQuery(this).val() == sf_defaultText){
+			jQuery(this).val('');
+			jQuery(this).attr('class', jQuery(this).attr('class') + ' sf_focused');
+			if(sf_expand){
+				jQuery("#" + jQuery(this).attr('container') + " .sf_search").animate({width:sf_width});
+			}
+		}
+	});
+	jQuery(".sf_input").blur(function () {
+		if(jQuery(this).val() == ''){
+			jQuery(this).val(sf_defaultText);
+			jQuery(this).attr('class', jQuery(this).attr('class').replace(/ sf_focused/g, ''));
+			if(sf_expand){
+				jQuery("#" + jQuery(this).attr('container') + " .sf_search").animate({width:sf_expand});
+			}
+		}
+	});
+});
+function sf_get_results(id)
 {
-	if(jQuery("#s").val() != "")
+	jQuery("#" + id + " .sf_input").attr('autocomplete', 'off');
+	if(jQuery('#sf_sb').length == 0){
+		jQuery('body').append('<div id="sf_sb" class="sf_sb" style="position:absolute;display:none;width:'+ sf_swidth + 'px;z-index:9999">'+
+								'<div class="sf_sb_cont">' +
+									'<div class="sf_sb_top"></div>' +
+									'<div id="sf_results" style="width:100%">' +
+										'<div id="sf_val" ></div>' +
+										'<div id="sf_more"></div>' +
+									'</div>' +
+									'<div class="sf_sb_bottom"></div>' +
+								'</div>' +
+							'</div>');
+	}
+	if(jQuery("#" + id + " .sf_input").val() != "")
 	{
 		var loading  = 	"<li class=\"sf_lnk sf_more sf_selected\">"+
-			"<a href=\"/?s=" + escape(jQuery("#s").val()) + "\">"+
-			"<img src=\"" + sf_loading + "\" style=\"width:16px;height:11px\"/>"+
+			"<a id=\"sf_loading\" href=\"/?s=" + escape(jQuery("#" + id + " .sf_input").val()) + "\">"+
 			"</a>"+
 		"</li>";
 		jQuery("#sf_val").html("<ul>"+loading+"</ul>");
-		jQuery("#sf_results").show();
-		var data = { action: "ajaxy_sf", sf_value: jQuery("#s").val()};
+		var pos = false;
+		if(jQuery("#sf_search").length > 0){
+			pos = jQuery("#sf_search").offset();
+			jQuery("#sf_sb").css({top:pos.top + jQuery("#sf_search").innerHeight(), left:pos.left});
+			jQuery("#sf_sb").show();
+		}
+		else if(jQuery("#" + id + " .sf_input").length > 0){
+			pos = jQuery("#" + id + " .sf_input").offset();
+			jQuery("#sf_sb").css({top:pos.top + jQuery("#" + id + " .sf_input").innerHeight(), left:pos.left});
+			jQuery("#sf_sb").show();
+		}
+		var data = { action: "ajaxy_sf", sf_value: jQuery("#" + id + " .sf_input").val()};
 		jQuery.post(sf_ajaxurl, data, function(resp) { 
 			var results = eval("("+ resp + ")");
 			var m = "";
@@ -32,8 +74,8 @@ function sf_get_results()
 				sf_selected = " sf_selected";
 			}
 			m += "<li class=\"sf_lnk sf_more" + sf_selected + "\">" + sf_templates + "</li>";
-			m = m.replace(/{search_value_escaped}/g, jQuery("#s").val());
-			m = m.replace(/{search_value}/g, jQuery("#s").val());
+			m = m.replace(/{search_value_escaped}/g, jQuery("#" + id + " .sf_input").val());
+			m = m.replace(/{search_value}/g, jQuery("#" + id + " .sf_input").val());
 			m = m.replace(/{total}/g, s);
 			if(s > 0)
 			{
@@ -44,13 +86,13 @@ function sf_get_results()
 				jQuery("#sf_val").html("<ul>"+m+"</ul>");
 			}
 			sf_load_events();
-			jQuery("#sf_results").show();
+			jQuery("#sf_sb").show();
 		 });
 
 	 }
 	 else
 	 {
-		jQuery("#sf_results").hide();
+		jQuery("#sf_sb").hide();
 	 }
 }
 function sf_load_events()
@@ -90,13 +132,13 @@ function sf_load(results)
 }
 
 jQuery(window).keydown(function(event){
-	if(jQuery("#sf_results").css("display") != "none")
+	if(jQuery("#sf_sb").css("display") != "none")
 	{
 		if(event.keyCode == "38" || event.keyCode == "40")
 		{
 			if(jQuery.browser.webkit)
 			{
-				jQuery("#sf_results").focus();
+				jQuery("#sf_sb").focus();
 			}
 			var s_item = null;
 			var after_s_item = null;
@@ -142,12 +184,21 @@ jQuery(window).keydown(function(event){
 		}
 		else if(event.keyCode == 27)
 		{
-			jQuery("#sf_results").hide();
+			jQuery("#sf_sb").hide();
 		}
 		else if(event.keyCode == 13)
 		{
-			window.location.href = jQuery("#sf_val li.sf_selected a").attr("href");
-			return false;
+			var b = jQuery("#sf_val li.sf_selected a");
+			if(typeof(b) != 'undefined' && b != '')
+			{
+				window.location.href = jQuery("#sf_val li.sf_selected a").attr("href");
+				return false;
+			}
+			else
+			{
+				window.location.href = "/?s=".jQuery('#s').val();
+				return false;
+			}
 		}
 	}
 });

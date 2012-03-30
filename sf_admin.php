@@ -1,155 +1,161 @@
 <?php 
 
-$post_types = sf_get_post_types();
+global $AjaxyLiveSearch;
 
-$allowed_tags = array('ID', 'post_title', 'post_author', 'post_date', 'post_date_formatted', 'post_content', 'post_excerpt', 'post_image', 'post_link');
+if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
+	$styles = $_POST['sf']['style'];
+	$AjaxyLiveSearch->set_style_setting('search_label'	, $styles['label']); 
+	$AjaxyLiveSearch->set_style_setting('width'			, (int)$styles['width']);
+	if(isset($styles['allow_expand'])){
+		$AjaxyLiveSearch->set_style_setting('expand'		, (int)$styles['expand']);
+	}
+	else{
+		$AjaxyLiveSearch->set_style_setting('expand'		, 0);
+	}
+	if(isset($styles['aspect_ratio'])){
+		$AjaxyLiveSearch->set_style_setting('aspect_ratio'		, 1);
+	}
+	else{
+		$AjaxyLiveSearch->set_style_setting('aspect_ratio'		, 0);
+	}
+	$AjaxyLiveSearch->set_style_setting('delay'			, (int)$styles['delay']);
+	$AjaxyLiveSearch->set_style_setting('border-width' 	, (int)$styles['b_width']);
+	$AjaxyLiveSearch->set_style_setting('border-type'	, $styles['b_type']);
+	$AjaxyLiveSearch->set_style_setting('border-color'	, $styles['b_color']);
+	$AjaxyLiveSearch->set_style_setting('results_width'	, (int)$styles['results_width']); 
+	$AjaxyLiveSearch->set_style_setting('excerpt' 		, $styles['excerpt']);
+	$AjaxyLiveSearch->set_style_setting('css'			, $styles['css']);
+	$AjaxyLiveSearch->set_style_setting('results_position'	, $styles['results_position']);
+	$AjaxyLiveSearch->set_style_setting('thumb_width'	, $styles['thumb_width']);
+	$AjaxyLiveSearch->set_style_setting('thumb_height'	, $styles['thumb_height']);
+	$message = "Settings saved";
+}
 ?>
-<style type="text/css">
-.sf_admin_block
-{
-padding: 10px;
-background: #F1F1F1;
-border: 1px solid #DDD;
-font-size: 12px;
-margin: 10px 10px 20px 0;
-}
-</style>
-<h2>Support us</h2>
-<p>
-	please donate some dollars for this project development and themes to be created, we are trying to make this project better, if you think it is worth it then u should support it ...<br/>
-	contact me at <a href="mailto:icu090@gmail.com">icu090@gmail.com</a> for support and development, please include your paypal id or donation id in your message.
-	</p>
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-<input type="hidden" name="cmd" value="_s-xclick">
-<input type="hidden" name="hosted_button_id" value="THNE9CQKJDETS">
-<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-</form>
-<hr/>
-<form action="" method="POST">
-<?php
-foreach( $post_types as $post_type )
-{
-	if(!empty($_POST['sf_'.$post_type->name]))
-	{
-		sf_set_templates($post_type->name, $_POST['sf_'.$post_type->name]);
-	}
-	if(!empty($_POST['sf_title_'.$post_type->name]))
-	{
-		$values = array(
-			'title' => $_POST['sf_title_'.$post_type->name], 
-			'show' => $_POST['sf_show_'.$post_type->name],
-			'search_content' => $_POST['sf_search_content_'.$post_type->name],
-			'limit' => $_POST['sf_limit_'.$post_type->name],
-			'order' => $_POST['sf_order_'.$post_type->name]
-			);
-		sf_set_setting($post_type->name, $values);
-	}
-	$setting = (array)sf_get_setting($post_type->name);
-	?>
-	<div>
-		<span><b><?php echo $post_type->labels->name; ?></b></span>
-		<select name="sf_show_<?php echo $post_type->name; ?>">
-			<option value="1"<?php echo ($setting['show'] == 1 ? ' selected="selected"':''); ?>>Show on search</option>
-			<option value="0"<?php echo ($setting['show'] == 0 ? ' selected="selected"':''); ?>>hide on search</option>
-		</select>
-	</div>
-	<div class="sf_admin_block">
-	<div><span>Search Title: </span>
-	<input type="text" value="<?php echo $setting['title']; ?>" name="sf_title_<?php echo $post_type->name; ?>"/>
-	
-	<select name="sf_search_content_<?php echo $post_type->name; ?>">
-		<option value="0"<?php echo ($setting['search_content'] == 0 ? ' selected="selected"':''); ?>>Search only title</option>
-		<option value="1"<?php echo ($setting['search_content'] == 1 ? ' selected="selected"':''); ?>>Search title and content (Slow)</option>
-	</select>
-	<span>Limit search results to </span><input type="text" value="<?php echo $setting['limit'] ; ?>" name="sf_limit_<?php echo $post_type->name; ?>"/>
-	<span>Sort order:</span>
-	<select name="sf_order_<?php echo $post_type->name; ?>">
-	<?php for($i = 0; $i < sizeof($post_types) + 1; $i ++) {?>
-		<?php $selected = ""; 
-		if($i == $setting['order']) { $selected = ' selected=""';} ?>
-		<option value="<?php echo $i; ?>"<?php echo $selected; ?>><?php echo $i; ?></option>
-	<?php } ?>
-	</select>
-	</div>
-	<textarea name="sf_<?php echo $post_type->name; ?>" style="height:170px; width:99%"><?php echo sf_get_templates($post_type->name); ?></textarea>
-	<p style="font-size:11px">you can add the following tag to the template (Each will be replaced with its value respectively):<br/><br/>
-	<?php
-	if($post_type->name != 'wpsc-product')
-	{
-		?>
-		<b>{<?php echo implode("}, {", $allowed_tags);?>}</b>
-		<?php
-	}
-	else
-	{
-		?>
-		<b>{<?php echo implode("}</b>, <b>{", $allowed_tags);?>}</b>, <b>{wpsc_price}</b>, <b>{wpsc_shipping}</b>, <b>{wpsc_image}</b>
-		<?php
-	}
-	?>
-	</p>
-	</div>
-	<hr/>
-	<?php
-}
-
-if(!empty($_POST['sf_category']))
-{
-	sf_set_templates('category', $_POST['sf_category']);
-}
-if(!empty($_POST['sf_title_category']))
-{
-	$values = array(
-			'title' => $_POST['sf_title_category'], 
-			'show' => $_POST['sf_show_category'],
-			'search_content' => false,
-			'limit' => $_POST['sf_limit_category'],
-			'order' => $_POST['sf_order_category']
-			);
-	sf_set_setting('category', $values);
-}
-$setting = sf_get_setting('category');
-$setting = (array)$setting;
-?>
-<div><span><b>Categories</b></span>
-<select name="sf_show_category">
-	<option value="1"<?php echo ($setting['show'] == 1 ? ' selected="selected"':''); ?>>Show on search</option>
-	<option value="0"<?php echo ($setting['show'] == 0 ? ' selected="selected"':''); ?>>hide on search</option>
-</select>
+<?php if ( $message ) : ?>
+<div id="message" class="updated"><p><?php echo $message; ?></p></div>
+<?php endif; ?>
+<br class="clear" />
+<div class="wrap">
+	<hr class="clear"/>
+	<h3>Search Form box</h3>
+	<table class="form-table">
+		<tbody>
+			<tr valign="top">
+				<th scope="row"><label>Search label</label></th>
+				<td>
+					<input type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('search_label',  _('Search')); ?>" name="sf[style][label]" class="regular-text">
+					<span class="description">This label appears inside the search form and will be hidden when the user clicks inside.</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label>Width</label></th>
+				<td>
+					<input style="width:40px" type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('width', 180); ?>" name="sf[style][width]" class="regular-text">
+					<span class="description">The width of the search form (width is per pixel) - the value should be integer.</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label>Allow expand</label></th>
+				<td>
+					<input type="checkbox" name="sf[style][allow_expand]" <?php echo  $AjaxyLiveSearch->get_style_setting('expand', 0 ) > 0 ? 'checked="checked"' : ''; ?>/>
+					<input style="width:40px" type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('expand', false); ?>" name="sf[style][expand]" class="regular-text">
+					<span class="description">The reduced width of the search form (this will allow the form to expand its width when it gains focus).</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label>Delay time</label></th>
+				<td>
+					<input style="width:40px" type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('delay', 500); ?>" name="sf[style][delay]" class="regular-text">
+					<span class="description">The delay time before showing the results (this will allow the user to input more text before searching) -  <b>(in millisecond, i.e 5000 = 5sec)</b>.</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label>Border width</label></th>
+				<td>
+					<input style="width:40px" type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('border-width' , 1); ?>" name="sf[style][b_width]" class="regular-text">
+					<span class="description">The width of the search form border.</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label>Border type</label></th>
+				<td>
+					<select name="sf[style][b_type]">
+						<option value="solid" <?php echo ($AjaxyLiveSearch->get_style_setting('border-type',  'solid') == 'solid' ? 'selected="selected"' : ""); ?>>solid</option>
+						<option value="dotted" <?php echo ($AjaxyLiveSearch->get_style_setting('border-type') == 'dotted' ? 'selected="selected"' : ""); ?>>dotted</option>
+						<option value="dashed" <?php echo ($AjaxyLiveSearch->get_style_setting('border-type') == 'dashed' ? 'selected="selected"' : ""); ?>>dashed</option>
+					</select>
+					<span class="description">The type of the search form border.</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label>Border color</label></th>
+				<td>
+					<input style="width:52px" type="text" value="<?php echo $AjaxyLiveSearch->get_style_setting('border-color','eee'); ?>" name="sf[style][b_color]" class="regular-text">
+					<span class="description">The color of the search form border (color value is hexa-decimal).</span>
+				</td>
+			</tr>
+			
+		</tbody>
+	</table>
+	<hr class="clear"/>
+	<h3>Search Results box</h3>
+	<table class="form-table">
+		<tbody>
+			<tr valign="top">
+				<th scope="row"><label>Width</label></th>
+				<td>
+					<input style="width:40px" type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('results_width', 315); ?>" name="sf[style][results_width]" class="regular-text">
+					<span class="description">The width of the results box (width is per pixel) - the value should be integer.</span>
+				</td>
+			</tr>
+			<?php /*
+			<tr valign="top">
+				<th scope="row"><label>Position</label></th>
+				<td>
+					<select name="sf[style][results_position]">
+						<option value="0" <?php echo ($AjaxyLiveSearch->get_style_setting('results_position', 0) == 0 ? 'selected="selected"' : ""); ?>>left</option>
+						<option value="1" <?php echo ($AjaxyLiveSearch->get_style_setting('results_position', 0) == 1 ? 'selected="selected"' : ""); ?>>right</option>
+					</select>
+					<span class="description">The position of the results box (it can be displayed starting from the left or from the right)</span>
+				</td>
+			</tr>
+			*/ ?>
+			<tr valign="top">
+				<th scope="row"><label>Total words</label></th>
+				<td>
+					<input style="width:40px" type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('excerpt' , 10); ?>" name="sf[style][excerpt]" class="regular-text">
+					<span class="description">The post content total number of words to be shown under each result.</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label>Thumb size</label></th>
+				<td>
+					<label>height</label>
+					<input style="width:40px" type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('thumb_height' , 50); ?>" name="sf[style][thumb_height]" class="regular-text">
+					<label>X width</label>
+					<input style="width:40px" type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('thumb_width' , 50); ?>" name="sf[style][thumb_width]" class="regular-text">
+					<input type="checkbox" name="sf[style][aspect_ratio]" <?php echo  $AjaxyLiveSearch->get_style_setting('aspect_ratio', 0 ) > 0 ? 'checked="checked"' : ''; ?>/><label>Maintain aspect ratio</label>
+					<br class="clear" />
+					<span class="description">The thumbnail size used in the post template it will modify {post_image_html} only, Maintaining aspect ratio is relatively slow so be aware, modifing the thumb size will need some css changes.</span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<hr class="clear"/>
+	<h3>Custom styles (<a href="http://www.w3schools.com/css/css_syntax.asp" target="_blank" rel="nofollow">CSS</a>)</h3>
+	<table class="form-table">
+		<tbody>
+			<tr valign="top">
+				<td colspan="2">
+					<textarea style="width:99%; height:150px" name="sf[style][css]" class="regular-text"><?php echo $AjaxyLiveSearch->get_style_setting('css', ''); ?></textarea>
+					<br class="clear"/>
+					<span class="description">Custom styles to be added in the plugin css.</span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<hr class="clear"/>
+	<input class="button-primary" name="sf_submit" type="submit" value="Save Changes" />
+	<br class="clear"/>
+	<br class="clear"/>
 </div>
-<div class="sf_admin_block">
-<div><span>Search Title: </span>
-<input type="text" value="<?php echo $setting['title']; ?>" name="sf_title_category"/>
-<span>Limit search results to </span><input type="text" value="<?php echo $setting['limit']; ?>" name="sf_limit_category"/>
-<span>Sort order:</span>
-<select name="sf_order_category">
-<?php for($i = 0; $i < sizeof($post_types) + 1; $i ++) {?>
-	<?php $selected = ""; 
-	if($i == $setting['order']) { $selected = ' selected=""';} ?>
-	<option value="<?php echo $i; ?>"<?php echo $selected; ?>><?php echo $i; ?></option>
-<?php } ?>
-</select>
-</div>
-<textarea name="sf_category" style="height:170px; width:99%"><?php echo sf_get_templates('category'); ?></textarea>
-</div>
-<div class="sf_style_setting">
-<div><b>Customize Search box:</b><br/><br/>
-<div>
-<?php if(!empty($_POST['sf_style_width'])): sf_set_style_setting('width', $_POST['sf_style_width']); endif; ?></div>
-<div>Width:<input type="text" value="<?php echo  sf_get_style_setting('width', 180); ?>" name="sf_style_width"/></div>
-<?php if(!empty($_POST['sf_style_b_width'])): sf_set_style_setting('border-width', $_POST['sf_style_b_width']); endif; ?>
-<div>border width:<input type="text" value="<?php echo  sf_get_style_setting('border-width' , 1); ?>" name="sf_style_b_width"/></div>
-<?php if(!empty($_POST['sf_style_b_type'])): sf_set_style_setting('border-type', $_POST['sf_style_b_type']); endif; ?>
-<div>border type:<select name="sf_style_b_type">
-	<option value="solid" <?php echo (sf_get_style_setting('border-type',  'solid') == 'solid' ? 'selected="selected"' : ""); ?>>solid</option>
-	<option value="dotted" <?php echo (sf_get_style_setting('border-type') == 'dotted' ? 'selected="selected"' : ""); ?>>dotted</option>
-	<option value="dashed" <?php echo (sf_get_style_setting('border-type') == 'dashed' ? 'selected="selected"' : ""); ?>>dashed</option>
-</select></div>
-<?php if(!empty($_POST['sf_style_b_color'])): sf_set_style_setting('border-color', $_POST['sf_style_b_color']); endif; ?>
-<div>border color:<input type="text" value="<?php echo  sf_get_style_setting('border-color','eee'); ?>" name="sf_style_b_color"/></div>
-
-</div>
-<br/>
-<input class="button-primary" type="submit" value="Save Changes" />
-</form>

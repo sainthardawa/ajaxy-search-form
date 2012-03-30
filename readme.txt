@@ -1,11 +1,11 @@
 === Plugin Name ===
 Contributors: n-for-all
 Donate link: http://ajaxy.org/
-Version: 1.0.5
+Version: 2.0.0
 Tags: facebook, live-search, ajax-search, category-search
 Requires at least: 3.0.0
 Tested up to: 3.3.0
-Stable tag: 1.0.5
+Stable tag: 2.0.0
 
 A facebook like ajaxy live search for wordpress, this plugin uses the same functionality as facebook to retrieve the results from your blog
 
@@ -27,13 +27,29 @@ add a new function <?php echo ajaxy_search_form(); ?>, insert it into ur theme t
 
 == Frequently Asked Questions ==
 
+-After the plugin is activated, nothing appears
+Make sure the theme search is disabled (test the ajaxy search form widget if it appears)
+
+-Styles are broken?
+Each theme has its own styles, email me at icu090@gmail.com and i will fix it right away 
 
 == Screenshots ==
 1. screenshot-1.png
 
 == Changelog ==
+
+= 2.0.0 =
+
+* Added themes support
+* Added widget box
+* Added results box settings to be independent from the search form settings
+* Multiple search forms can work on the same page
+* Added croping to images + fetching image from within content if there is no featured image
+* Added a preview page so that the settings can be viewed on the admin page
+* Used wordpress default list table for a better usability
+
 = 1.0.5 =
-* fixed a bug with search returning same post tag names
+* fixed taxonomy search to return result for same taxonomy
 
 = 1.0.4 =
 * Added Search post tags and custom taxonomy
