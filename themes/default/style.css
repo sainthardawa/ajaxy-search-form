@@ -126,6 +126,7 @@
 	-moz-box-shadow:none !important;
 	width:90%;
 	margin-left:2px;
+	height:19px !important;
 }
 .sf_search .sf_focused{
 	color:#333 !important;
