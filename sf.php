@@ -636,7 +636,7 @@ class AjaxyLiveSearch {
 		}
 		$id = uniqid('sf_');
 		$border = $this->get_style_setting('border-width', '1') . "px " . $this->get_style_setting('border-type', 'solid') . " #" .$this->get_style_setting('border-color', 'dddddd');
-		$form = '<!-- Ajaxy Search Form v'.AJAXY_SF_VERSION.' --><div class="sf_container" id="'.$id.'"><form role="search" method="get" class="searchform" action="' . home_url( '/' ) . '" >
+		$form = '<!-- Ajaxy Search Form v'.AJAXY_SF_VERSION.' --><div class="sf_container" id="'.$id.'"><form role="search" method="get" id="searchform" class="searchform" action="' . home_url( '/' ) . '" >
 		<div><label class="screen-reader-text" for="s">' . __('Search for:') . '</label>
 		<div class="sf_search" style="width:'.($width).'px; border:'.$border.'"><span class="sf_block">
 		<input class="sf_input" autocomplete="off" type="text" value="' . (get_search_query() == '' ? $label : get_search_query()). '" name="s" container="'.$id.'"/>
