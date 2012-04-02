@@ -132,7 +132,7 @@ function sf_load(results)
 }
 
 jQuery(window).keydown(function(event){
-	if(jQuery("#sf_sb").css("display") != "none")
+	if(jQuery("#sf_sb").css("display") != "none" && jQuery("#sf_sb").css("display") != "undefined" && jQuery("#sf_sb").length > 0)
 	{
 		if(event.keyCode == "38" || event.keyCode == "40")
 		{
