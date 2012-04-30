@@ -29,7 +29,8 @@ if(!empty($post_type)){
 					'show' => $_POST['sf_show_'.$post_type->name],
 					'search_content' => $_POST['sf_search_content_'.$post_type->name],
 					'limit' => $_POST['sf_limit_'.$post_type->name],
-					'order' => $_POST['sf_order_'.$post_type->name]
+					'order' => $_POST['sf_order_'.$post_type->name],
+					'excludes' => isset($_POST['sf_exclude_'.$post_type->name]) ? $_POST['sf_exclude_'.$post_type->name]: ''
 					);
 				$AjaxyLiveSearch->set_setting($post_type->name, $values);
 			}
@@ -109,6 +110,80 @@ if(!empty($post_type)){
 						</div>
 					</div>
 
+				</div>
+			</div>
+			<div id="submitdiv" class="postbox ">
+				<div class="handlediv" title="Click to toggle"><br></div>
+				<h3 class="hndle"><span>Exclude '<?php echo $post_type->name; ?>'</span></h3>
+				<div class="inside">
+					<div class="submitbox">	
+						<div class="misc-pub-section" >
+						
+						
+							<?php 
+							$excludes = (isset($setting['excludes']) && sizeof($setting['excludes']) > 0 ? $setting['excludes'] : array());
+							if($post_type->name == 'category'){		
+							$taxonomies = get_taxonomies(array(
+											  'public'   => true
+									  
+									) , 'names'); 	
+							foreach($taxonomies as $key => $taxonomy){							
+								$args = array(
+									'type'                     => 'post',
+									'child_of'                 => 0,
+									'parent'                   => '',
+									'orderby'                  => 'name',
+									'order'                    => 'ASC',
+									'hide_empty'               => 0,
+									'hierarchical'             => 1,
+									'exclude'                  => '',
+									'include'                  => '',
+									'number'                   => '',
+									'taxonomy'                 => $key,
+									'pad_counts'               => false );
+								$categories = get_categories( $args ); 
+								if(sizeof($categories) > 0){
+									?>
+									<h3><?php echo $taxonomy; ?></h3>
+									<div style="height:200px;overflow:auto">
+									<ul>
+									<?php
+									foreach($categories as $category){
+									?>
+										<li><input autocomplete="off" type="checkbox" <?php echo (in_array($category->term_id, $excludes) ? 'checked="checked"' :''); ?> name="sf_exclude_<?php echo $post_type->name; ?>[]" value="<?php echo $category->term_id; ?>"/> <?php echo $category->name; ?></li>
+									<?php
+									}
+									?>
+									</ul>
+									</div>
+									<?php
+									}
+								}
+							}
+							else{
+								?>
+								<h3><?php echo $post_type->name; ?></h3>
+								<div style="height:200px;overflow:auto">
+								<ul>
+								<?php
+								$posts = get_posts( array('post_type' => $post_type->name) ); 
+								foreach($posts as $pst){
+								?>
+									<li><input autocomplete="off" type="checkbox" <?php echo (in_array($pst->ID, $excludes) ? 'checked="checked"' :''); ?> name="sf_exclude_<?php echo $post_type->name; ?>[]" value="<?php echo $pst->ID; ?>"/> <?php echo $pst->post_title; ?></li>
+								<?php
+								}
+								?>
+								</ul>
+								</div>
+								<?php
+							}
+							?>
+						<hr/>
+						<p>Prevent selected '<?php echo $post_type->name; ?>' from appearing in the search results</p>
+						</div>
+						
+					</div>
+					
 				</div>
 			</div>
 		</div>

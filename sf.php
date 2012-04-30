@@ -6,7 +6,7 @@
 	Plugin Name: Ajaxy Live Search
 	Plugin URI: http://ajaxy.org
 	Description: Transfer wordpress form into an advanced ajax search form the same as facebook live search, This version supports themes and can work with almost all themes without any modifications
-	Version: 2.0.1
+	Version: 2.1.0
 	Author: Ajaxy Team
 	Author URI: http://www.ajaxy.org
 	License: GPLv2 or later
@@ -14,7 +14,7 @@
 
 
 
-define('AJAXY_SF_VERSION', '2.0.1');
+define('AJAXY_SF_VERSION', '2.1.0');
 define('AJAXY_SF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define('AJAXY_THEMES_DIR', dirname(__FILE__)."/themes/");
 define( 'AJAXY_SF_NO_IMAGE', plugin_dir_url( __FILE__ ) ."themes/default/images/no-image.gif");
@@ -98,7 +98,7 @@ class AjaxyLiveSearch {
 			
 			<ul class="subsubsub">
 				<li class="active"><a href="<?php echo menu_page_url('ajaxy_sf_admin', false); ?>" class="<?php echo (!$tab ? 'current' : ''); ?>">General settings <span class="count"></span></a> |</li>
-				<li class="active"><a href="<?php echo menu_page_url('ajaxy_sf_admin', false).'&tab=templates'; ?>" class="<?php echo ($tab == 'templates' ? 'current' : ''); ?>">Templates <span class="count"></span></a> |</li>
+				<li class="active"><a href="<?php echo menu_page_url('ajaxy_sf_admin', false).'&tab=templates'; ?>" class="<?php echo ($tab == 'templates' ? 'current' : ''); ?>">Templates<span class="count"></span></a> |</li>
 				<li class="active"><a href="<?php echo menu_page_url('ajaxy_sf_admin', false).'&tab=themes'; ?>" class="<?php echo ($tab == 'themes' ? 'current' : ''); ?>">Themes<span class="count"></span></a> |</li>
 				<li class="active"><a href="<?php echo menu_page_url('ajaxy_sf_admin', false).'&tab=preview'; ?>" class="<?php echo ($tab == 'preview' ? 'current' : ''); ?>">Preview<span class="count"></span></a></li>
 			</ul>
@@ -394,7 +394,8 @@ class AjaxyLiveSearch {
 		global $wpdb;
 		$categories = array();
 		$setting = (object)$this->get_setting('category');
-		$results = $wpdb->get_results($wpdb->prepare("select distinct($wpdb->terms.name), $wpdb->terms.term_id,  $wpdb->term_taxonomy.taxonomy from $wpdb->terms, $wpdb->term_taxonomy where name like '%%%s%%' and $wpdb->term_taxonomy.taxonomy<>'link_category' and $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id limit 0, ".$setting->limit,  $name));
+		$excludes = (isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes) ? " AND $wpdb->terms.term_id NOT IN (".implode(',', $setting->excludes).")" : "");
+		$results = $wpdb->get_results($wpdb->prepare("select distinct($wpdb->terms.name), $wpdb->terms.term_id,  $wpdb->term_taxonomy.taxonomy from $wpdb->terms, $wpdb->term_taxonomy where name like '%%%s%%' and $wpdb->term_taxonomy.taxonomy<>'link_category' and $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id $excludes limit 0, ".$setting->limit,  $name));
 		if(sizeof($results) > 0 && is_array($results) && !is_wp_error($results))
 		{
 			$unset_array = array('term_group', 'term_taxonomy_id', 'taxonomy', 'parent', 'count', 'cat_ID', 'cat_name', 'category_parent');
@@ -421,7 +422,8 @@ class AjaxyLiveSearch {
 		$posts = array();
 		$size = array('height' => $this->get_style_setting('thumb_height' , 50), 'width' => $this->get_style_setting('thumb_weight' , 50));
 		$setting = (object)$this->get_setting($post_type);
-		$results = $wpdb->get_results( $wpdb->prepare("select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($setting->search_content == 1 ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' limit 0,".$setting->limit,  ($setting->search_content == true ? array($name, $name):$name)));
+		$excludes = (isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes) ? " AND ID NOT IN (".implode(',', $setting->excludes).")" : "");
+		$results = $wpdb->get_results( $wpdb->prepare("select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($setting->search_content == 1 ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes limit 0,".$setting->limit,  ($setting->search_content == true ? array($name, $name):$name)));
 		$date_format = get_option( 'date_format' );
 		$unset_array = array('post_type', 'post_date_gmt', 'post_status', 'comment_status', 'ping_status', 'post_password', 'post_name', 'post_content_filtered', 'to_ping', 'pinged', 'post_modified', 'post_modified_gmt', 'post_parent', 'guid', 'menu_order', 'post_mime_type', 'comment_count', 'ancestors', 'filter');
 		if(sizeof($results) > 0 && is_array($results) && !is_wp_error($results))
