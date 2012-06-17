@@ -32,6 +32,9 @@ if(!empty($post_type)){
 					'order' => $_POST['sf_order_'.$post_type->name],
 					'excludes' => isset($_POST['sf_exclude_'.$post_type->name]) ? $_POST['sf_exclude_'.$post_type->name]: ''
 					);
+				if(!empty($_POST['sf_order_results_'.$post_type->name])){
+					$values['order_results'] = trim($_POST['sf_order_results_'.$post_type->name]);
+				}
 				$AjaxyLiveSearch->set_setting($post_type->name, $values);
 			}
 			$message = "Settings saved";
@@ -92,12 +95,22 @@ if(!empty($post_type)){
 										<option value="1"<?php echo ($setting['search_content'] == 1 ? ' selected="selected"':''); ?>>Title and content (Slow)</option>
 									</select>
 								</div>
+								<?php if($type != 'category'): ?>
+								<div class="misc-pub-section"><label>Order results by:</label>
+									<select name="sf_order_results_<?php echo $post_type->name; ?>">
+										<option value=""<?php echo ($setting['order_results'] == '' ? ' selected="selected"':''); ?>>None (Default)</option>
+										<option value="post_title asc"<?php echo ($setting['order_results'] == 'post_title asc' ? ' selected="selected"':''); ?>>Title - Ascending</option>
+										<option value="post_title desc"<?php echo ($setting['order_results'] == 'post_title desc' ? ' selected="selected"':''); ?>>Title - Descending</option>
+										<option value="post_date asc"<?php echo ($setting['order_results'] == 'post_date asc' ? ' selected="selected"':''); ?>>Date - Ascending</option>
+										<option value="post_date desc"<?php echo ($setting['order_results'] == 'post_date desc' ? ' selected="selected"':''); ?>>Date - Descending</option>
+									</select>
+								</div>
+								<?php endif; ?>
 								<div class="misc-pub-section " id="visibility">Order: 
 								<input type="text" style="width:50px" value="<?php echo $setting['order'] ; ?>" name="sf_order_<?php echo $post_type->name; ?>"/>
 								</div>
 								<div class="misc-pub-section " id="limit_results"><span>Limit results to:</span>
 									<input type="text" style="width:50px" value="<?php echo $setting['limit'] ; ?>" name="sf_limit_<?php echo $post_type->name; ?>"/>
-								</select>
 								</div>
 							</div>
 							<div class="clear"></div>

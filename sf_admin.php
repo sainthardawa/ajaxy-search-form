@@ -4,6 +4,7 @@ global $AjaxyLiveSearch;
 
 if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 	$styles = $_POST['sf']['style'];
+	$templates = $_POST['sf']['template'];
 	$AjaxyLiveSearch->set_style_setting('search_label'	, $styles['label']); 
 	$AjaxyLiveSearch->set_style_setting('width'			, (int)$styles['width']);
 	if(isset($styles['allow_expand'])){
@@ -28,6 +29,7 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 	//$AjaxyLiveSearch->set_style_setting('results_position'	, $styles['results_position']);
 	$AjaxyLiveSearch->set_style_setting('thumb_width'	, $styles['thumb_width']);
 	$AjaxyLiveSearch->set_style_setting('thumb_height'	, $styles['thumb_height']);
+	$AjaxyLiveSearch->set_templates('more'	, $templates['more_results']);
 	$message = "Settings saved";
 }
 ?>
@@ -137,6 +139,26 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 					<input type="checkbox" name="sf[style][aspect_ratio]" <?php echo  $AjaxyLiveSearch->get_style_setting('aspect_ratio', 0 ) > 0 ? 'checked="checked"' : ''; ?>/><label>Maintain aspect ratio</label>
 					<br class="clear" />
 					<span class="description">The thumbnail size used in the post template it will modify {post_image_html} only, Maintaining aspect ratio is relatively slow so be aware, modifing the thumb size will need some css changes.</span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<hr class="clear"/>
+	<h3>More results box</h3>
+	<table class="form-table">
+		<tbody>
+			<tr valign="top">
+				<th scope="row"><label>Search Url</label></th>
+				<td>
+					<input type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('search_url',  home_url().'/?s=%s'); ?>" name="sf[style][url]" class="regular-text">
+					<span class="description">This search URL for the "See more results"</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<td colspan="2">
+					<textarea style="width:99%; height:150px" name="sf[template][more_results]" class="regular-text"><?php echo $AjaxyLiveSearch->get_templates('more'); ?></textarea>
+					<br class="clear"/>
+					<span class="description">More results text (allowed parameters ( <b>{search_value}</b> <b>{search_value_escaped}</b> <b>{search_url_escaped}</b>).</span>
 				</td>
 			</tr>
 		</tbody>

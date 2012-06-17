@@ -6,7 +6,7 @@
 	Plugin Name: Ajaxy Live Search
 	Plugin URI: http://ajaxy.org
 	Description: Transfer wordpress form into an advanced ajax search form the same as facebook live search, This version supports themes and can work with almost all themes without any modifications
-	Version: 2.1.0
+	Version: 2.1.1
 	Author: Ajaxy Team
 	Author URI: http://www.ajaxy.org
 	License: GPLv2 or later
@@ -14,7 +14,7 @@
 
 
 
-define('AJAXY_SF_VERSION', '2.1.0');
+define('AJAXY_SF_VERSION', '2.1.1');
 define('AJAXY_SF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define('AJAXY_THEMES_DIR', dirname(__FILE__)."/themes/");
 define( 'AJAXY_SF_NO_IMAGE', plugin_dir_url( __FILE__ ) ."themes/default/images/no-image.gif");
@@ -373,7 +373,7 @@ class AjaxyLiveSearch {
 			}
 			else
 			{
-				$template_post = '<a href="/?s={search_value_escaped}"><span class="sf_text">See more results for "{search_value}"</span><span class="sf_small">Displaying top {total} results</span></a>';
+				$template_post = '<a href="{search_url_escaped}"><span class="sf_text">See more results for "{search_value}"</span><span class="sf_small">Displaying top {total} results</span></a>';
 			}
 		}
 		else
@@ -423,7 +423,8 @@ class AjaxyLiveSearch {
 		$size = array('height' => $this->get_style_setting('thumb_height' , 50), 'width' => $this->get_style_setting('thumb_weight' , 50));
 		$setting = (object)$this->get_setting($post_type);
 		$excludes = (isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes) ? " AND ID NOT IN (".implode(',', $setting->excludes).")" : "");
-		$results = $wpdb->get_results( $wpdb->prepare("select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($setting->search_content == 1 ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes limit 0,".$setting->limit,  ($setting->search_content == true ? array($name, $name):$name)));
+		$order_results = (isset($setting->order_results) ? " order by ".$setting->order_results : "");
+		$results = $wpdb->get_results( $wpdb->prepare("select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($setting->search_content == 1 ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes $order_results limit 0,".$setting->limit,  ($setting->search_content == true ? array($name, $name):$name)));
 		$date_format = get_option( 'date_format' );
 		$unset_array = array('post_type', 'post_date_gmt', 'post_status', 'comment_status', 'ping_status', 'post_password', 'post_name', 'post_content_filtered', 'to_ping', 'pinged', 'post_modified', 'post_modified_gmt', 'post_parent', 'guid', 'menu_order', 'post_mime_type', 'comment_count', 'ancestors', 'filter');
 		if(sizeof($results) > 0 && is_array($results) && !is_wp_error($results))
@@ -519,6 +520,7 @@ class AjaxyLiveSearch {
 				var sf_templates = '.json_encode($this->get_templates('more')).';
 				var sf_ajaxurl = "'.admin_url('admin-ajax.php').'";
 				var sf_defaultText = "'.$label.'";
+				var sf_url = "'.str_replace('"', '\"', $this->get_style_setting('search_url',  home_url().'/?s=%s')).'";
 			/* ]]> */
 		</script>';
 		echo $script.'<script src="'.$x.'" type="text/javascript"></script>

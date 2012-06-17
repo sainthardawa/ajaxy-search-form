@@ -1,21 +1,28 @@
 === Plugin Name ===
 Contributors: n-for-all
 Donate link: http://ajaxy.org/
-Version: 2.1.0
+Version: 2.1.1
 Tags: facebook, live-search, ajax-search, category-search
 Requires at least: 3.0.0
 Tested up to: 3.3.0
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 
-A facebook like ajaxy live search for wordpress, this plugin uses the same functionality as facebook to retrieve the results from your blog
+A facebook like ajaxy live search for wordpress, this plugin uses the same functionality as facebook to retrieve the results from your blog, it uses jQuery with a custom php search queries to retrieve the results from your blog
 
 == Description ==
 
-this plugin is a an ajax live search that uses the same theme as facebook search, it uses ajax and jQuery to get results from php
+* this plugin is a an ajax live search that uses the same theme as facebook search, it uses ajax and jQuery to get results from php
 
-this plugin can search categories, post types and supports wp-ecommerce plugin
+* 2 themes have been added one light and one dark to fit most blogs need and i am also available to customize each theme to suit your blog theme 
+
+* this plugin can search categories, post tags, post types and supports wp-ecommerce plugin and more to go
+
+* this plugin was a scratch when i created it, Now it is competing with the best wordpress live search plugins out there, it is now supporting all customization offered by the best live search plugins for wordpress
+
+* the installation can be a little tricky though, "Best things doesn't always come the easy way", but i am ready to help out... please send me an email or leave me a message at ajaxy.org...
 
 == Installation ==
+
 
 1. Upload `ajaxy-search-form` folder to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
@@ -37,9 +44,16 @@ Each theme has its own styles, email me at icu090@gmail.com and i will fix it ri
 1. screenshot-1.png
 
 == Changelog ==
+
+
+= 2.1.1 =
+
+* Added the ability customize the "see more results" box and to change the search url
+* Added the ability to sort out the results returned in the frontend 
+
 = 2.1.0 =
 
-Add the ability to remove specific categories/post types from the search
+* Added the ability to remove specific categories/post types from the search
 
 
 = 2.0.2 =

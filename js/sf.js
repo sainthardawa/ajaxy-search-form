@@ -1,3 +1,4 @@
+var sf_current_id = 0;
 jQuery(document).click(function(){ jQuery("#sf_sb").hide(); });
 jQuery(document).ready(function(){
 	jQuery(".sf_input").focus(function (){
@@ -21,6 +22,7 @@ jQuery(document).ready(function(){
 });
 function sf_get_results(id)
 {
+	sf_current_id = id;
 	jQuery("#" + id + " .sf_input").attr('autocomplete', 'off');
 	if(jQuery('#sf_sb').length == 0){
 		jQuery('body').append('<div id="sf_sb" class="sf_sb" style="position:absolute;display:none;width:'+ sf_swidth + 'px;z-index:9999">'+
@@ -37,7 +39,7 @@ function sf_get_results(id)
 	if(jQuery("#" + id + " .sf_input").val() != "")
 	{
 		var loading  = 	"<li class=\"sf_lnk sf_more sf_selected\">"+
-			"<a id=\"sf_loading\" href=\"/?s=" + escape(jQuery("#" + id + " .sf_input").val()) + "\">"+
+			"<a id=\"sf_loading\" href=\"" + sf_url.replace('%s', escape(jQuery("#" + id + " .sf_input").val())) + "\">"+
 			"</a>"+
 		"</li>";
 		jQuery("#sf_val").html("<ul>"+loading+"</ul>");
@@ -75,6 +77,7 @@ function sf_get_results(id)
 			}
 			m += "<li class=\"sf_lnk sf_more" + sf_selected + "\">" + sf_templates + "</li>";
 			m = m.replace(/{search_value_escaped}/g, jQuery("#" + id + " .sf_input").val());
+			m = m.replace(/{search_url_escaped}/g, sf_url.replace('%s', escape(jQuery("#" + id + " .sf_input").val())));
 			m = m.replace(/{search_value}/g, jQuery("#" + id + " .sf_input").val());
 			m = m.replace(/{total}/g, s);
 			if(s > 0)
@@ -196,7 +199,9 @@ jQuery(window).keydown(function(event){
 			}
 			else
 			{
-				window.location.href = "/?s=".jQuery('#s').val();
+				if(sf_current_id > 0){
+					window.location.href = sf_url.replace('%s', escape(jQuery("#" + sf_current_id + " .sf_input").val()));
+				}
 				return false;
 			}
 		}
