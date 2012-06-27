@@ -191,10 +191,10 @@ jQuery(window).keydown(function(event){
 		}
 		else if(event.keyCode == 13)
 		{
-			var b = jQuery("#sf_val li.sf_selected a");
+			var b = jQuery("#sf_val li.sf_selected a").attr("href");
 			if(typeof(b) != 'undefined' && b != '')
 			{
-				window.location.href = jQuery("#sf_val li.sf_selected a").attr("href");
+				window.location.href = b;
 				return false;
 			}
 			else
