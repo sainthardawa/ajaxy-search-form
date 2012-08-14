@@ -163,7 +163,7 @@ if(!empty($post_type)){
 									<?php
 									foreach($categories as $category){
 									?>
-										<li><input autocomplete="off" type="checkbox" <?php echo (in_array($category->term_id, $excludes) ? 'checked="checked"' :''); ?> name="sf_exclude_<?php echo $post_type->name; ?>[]" value="<?php echo $category->term_id; ?>"/> <?php echo $category->name; ?></li>
+										<li><input autocomplete="off" type="checkbox" <?php echo (in_array($category->term_id, (array)$excludes) ? 'checked="checked"' :''); ?> name="sf_exclude_<?php echo $post_type->name; ?>[]" value="<?php echo $category->term_id; ?>"/> <?php echo $category->name; ?></li>
 									<?php
 									}
 									?>
@@ -182,7 +182,7 @@ if(!empty($post_type)){
 								$posts = get_posts( array('post_type' => $post_type->name) ); 
 								foreach($posts as $pst){
 								?>
-									<li><input autocomplete="off" type="checkbox" <?php echo (in_array($pst->ID, $excludes) ? 'checked="checked"' :''); ?> name="sf_exclude_<?php echo $post_type->name; ?>[]" value="<?php echo $pst->ID; ?>"/> <?php echo $pst->post_title; ?></li>
+									<li><input autocomplete="off" type="checkbox" <?php echo (in_array($pst->ID, (array)$excludes) ? 'checked="checked"' :''); ?> name="sf_exclude_<?php echo $post_type->name; ?>[]" value="<?php echo $pst->ID; ?>"/> <?php echo $pst->post_title; ?></li>
 								<?php
 								}
 								?>
