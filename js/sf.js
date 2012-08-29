@@ -39,7 +39,7 @@ function sf_get_results(id)
 	if(jQuery("#" + id + " .sf_input").val() != "")
 	{
 		var loading  = 	"<li class=\"sf_lnk sf_more sf_selected\">"+
-			"<a id=\"sf_loading\" href=\"" + sf_url.replace('%s', escape(jQuery("#" + id + " .sf_input").val())) + "\">"+
+			"<a id=\"sf_loading\" href=\"" + sf_url.replace('%s', encodeURI(jQuery("#" + id + " .sf_input").val())) + "\">"+
 			"</a>"+
 		"</li>";
 		jQuery("#sf_val").html("<ul>"+loading+"</ul>");
@@ -77,7 +77,7 @@ function sf_get_results(id)
 			}
 			m += "<li class=\"sf_lnk sf_more" + sf_selected + "\">" + sf_templates + "</li>";
 			m = m.replace(/{search_value_escaped}/g, jQuery("#" + id + " .sf_input").val());
-			m = m.replace(/{search_url_escaped}/g, sf_url.replace('%s', escape(jQuery("#" + id + " .sf_input").val())));
+			m = m.replace(/{search_url_escaped}/g, sf_url.replace('%s', encodeURI(jQuery("#" + id + " .sf_input").val())));
 			m = m.replace(/{search_value}/g, jQuery("#" + id + " .sf_input").val());
 			m = m.replace(/{total}/g, s);
 			if(s > 0)
@@ -200,7 +200,7 @@ jQuery(window).keydown(function(event){
 			else
 			{
 				if(sf_current_id > 0){
-					window.location.href = sf_url.replace('%s', escape(jQuery("#" + sf_current_id + " .sf_input").val()));
+					window.location.href = sf_url.replace('%s', encodeURI(jQuery("#" + sf_current_id + " .sf_input").val()));
 				}
 				return false;
 			}
