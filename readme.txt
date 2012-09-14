@@ -7,7 +7,7 @@ Requires at least: 3.0.0
 Tested up to: 3.4.1
 Stable tag: 2.1.4
 
-A facebook like ajaxy live search for wordpress, this plugin uses the same functionality as facebook to retrieve the results from your blog, it uses jQuery with a custom php search queries to retrieve the results from your blog
+A facebook like ajaxy live search for wordpress, this plugin uses the same functionality as facebook to retrieve the results from your blog.
 
 == Description ==
 
