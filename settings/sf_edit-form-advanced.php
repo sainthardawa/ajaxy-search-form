@@ -179,7 +179,7 @@ if(!empty($post_type)){
 								<div style="height:200px;overflow:auto">
 								<ul>
 								<?php
-								$posts = get_posts( array('post_type' => $post_type->name) ); 
+								$posts = get_posts( array('post_type' => $post_type->name, 'numberposts' => -1) ); 
 								foreach($posts as $pst){
 								?>
 									<li><input autocomplete="off" type="checkbox" <?php echo (in_array($pst->ID, (array)$excludes) ? 'checked="checked"' :''); ?> name="sf_exclude_<?php echo $post_type->name; ?>[]" value="<?php echo $pst->ID; ?>"/> <?php echo $pst->post_title; ?></li>

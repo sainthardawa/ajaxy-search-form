@@ -124,7 +124,7 @@ function sf_load(results)
 		if(results.all.length > 0)
 		{
 			m += "<li class=\"sf_header\">" + results.title + "</li>";
-			for(var i in results.all)
+			for(var i = 0; i < results.all.length; i ++)
 			{
 				s ++;
 				m += "<li class=\"sf_lnk "+results.class_name +"\">"+ sf_replace_results(results.all[i], results.template) + "</li>";
