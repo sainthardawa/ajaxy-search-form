@@ -123,12 +123,13 @@ function sf_load(results)
 	{
 		if(results.all.length > 0)
 		{
-			m += "<li class=\"sf_header\">" + results.title + "</li>";
+			m += "<li class=\"sf_header\">" + results.title + "</li><li><div class=\"sf_result_container\"><ul>";
 			for(var i = 0; i < results.all.length; i ++)
 			{
 				s ++;
 				m += "<li class=\"sf_lnk "+results.class_name +"\">"+ sf_replace_results(results.all[i], results.template) + "</li>";
 			}
+			m += "</ul></div></li>";
 		}
 	}
 	return new Array(m, s);

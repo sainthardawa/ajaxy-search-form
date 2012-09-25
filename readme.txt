@@ -1,11 +1,11 @@
 === Plugin Name ===
 Contributors: n-for-all
 Donate link: http://ajaxy.org/
-Version: 2.1.4
+Version: 2.1.5
 Tags: facebook, live-search, ajax-search, category-search
 Requires at least: 3.0.0
 Tested up to: 3.4.1
-Stable tag: 2.1.4
+Stable tag: 2.1.5
 
 A facebook like ajaxy live search for wordpress, this plugin uses the same functionality as facebook to retrieve the results from your blog.
 
@@ -41,9 +41,15 @@ Make sure the theme search is disabled (test the ajaxy search form widget if it 
 Each theme has its own styles, email me at icu090@gmail.com and i will fix it right away 
 
 == Screenshots ==
-1. screenshot-1.png
+1. screenshot-1.jpg
+2. screenshot-2.png
 
 == Changelog ==
+= 2.1.5 =
+
+* display posts results under category, example if you search for category "cat", all posts under this category will be shown under "cat" sectio, to enable this search mode, go to templates, edit the category template and set "Show "Posts under Category" to show.
+* added scrollbars for more results and less size.
+
 = 2.1.4 =
 
 * Basic support for wpml plugin

@@ -6,7 +6,7 @@
 	Plugin Name: Ajaxy Live Search
 	Plugin URI: http://ajaxy.org
 	Description: Transfer wordpress form into an advanced ajax search form the same as facebook live search, This version supports themes and can work with almost all themes without any modifications
-	Version: 2.1.4
+	Version: 2.1.5
 	Author: Ajaxy Team
 	Author URI: http://www.ajaxy.org
 	License: GPLv2 or later
@@ -14,7 +14,7 @@
 
 
 
-define('AJAXY_SF_VERSION', '2.1.4');
+define('AJAXY_SF_VERSION', '2.1.5');
 define('AJAXY_SF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define('AJAXY_THEMES_DIR', dirname(__FILE__)."/themes/");
 define( 'AJAXY_SF_NO_IMAGE', plugin_dir_url( __FILE__ ) ."themes/default/images/no-image.gif");
@@ -277,6 +277,9 @@ class AjaxyLiveSearch {
 		if($scat['show'] == 1){
 			$show_posts['category'] = $scat['order'];
 		}
+		if($scat['ushow'] == 1){
+			$show_posts['post_category'] = $scat['order'];
+		}
 		asort($show_posts);
 		foreach($show_posts as $key => $value)
 		{
@@ -323,6 +326,7 @@ class AjaxyLiveSearch {
 			$values = array(
 					'title' => $name, 
 					'show' => 1,
+					'ushow' => 0,
 					'search_content' => 0,
 					'limit' => 5,
 					'order' => 0
@@ -390,12 +394,12 @@ class AjaxyLiveSearch {
 		}
 		return $template_post;
 	}
-	function category($name, $limit = 5)
+	function category($name, $pst_type = 'category', $limit = 5)
 	{
 		global $wpdb, $sitepress;
 		$wpml_lang_code = (defined('ICL_LANGUAGE_CODE') ? ICL_LANGUAGE_CODE: ''); 
 		$categories = array();
-		$setting = (object)$this->get_setting('category');
+		$setting = (object)$this->get_setting($pst_type);
 		$excludes = (isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes) ? " AND $wpdb->terms.term_id NOT IN (".implode(',', $setting->excludes).")" : "");
 		$results = null;
 		if($wpml_lang_code != ''){
@@ -419,18 +423,27 @@ class AjaxyLiveSearch {
 					{
 						unset($cat->{$uarr});
 					}
-					$categories[] = $cat; 
+					if($pst_type == 'post_category') {
+						$limit = isset($setting->limit_posts) ? $setting->limit_posts : 5;
+						$psts = $this->posts_by_term($cat->term_id, $limit);
+						if(sizeof($psts) > 0) {
+							$categories[$cat->term_id] = array('name' => $cat->name,'posts' => $this->posts_by_term($cat->term_id, $limit)); 
+						}
+					}
+					else {
+						$categories[] = $cat; 
+					}
 				}
 			}
 		}
 		return $categories;
 	}
-	function posts($name, $post_type='post')
+	function posts($name, $post_type='post', $term_id = false)
 	{
 		global $wpdb;
 		$wpml_lang_code = (defined('ICL_LANGUAGE_CODE') ? ICL_LANGUAGE_CODE: '');
 		$posts = array();
-		$size = array('height' => $this->get_style_setting('thumb_height' , 50), 'width' => $this->get_style_setting('thumb_weight' , 50));
+		
 		$setting = (object)$this->get_setting($post_type);
 		$excludes = (isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes) ? " AND ID NOT IN (".implode(',', $setting->excludes).")" : "");
 		$order_results = (isset($setting->order_results) ? " order by ".$setting->order_results : "");
@@ -443,60 +456,83 @@ class AjaxyLiveSearch {
 			$results = $wpdb->get_results( $wpdb->prepare("select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($setting->search_content == 1 ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes $order_results limit 0,".$setting->limit,  ($setting->search_content == true ? array($name, $name):$name)));
 		}
 		$date_format = get_option( 'date_format' );
-		$unset_array = array('post_type', 'post_date_gmt', 'post_status', 'comment_status', 'ping_status', 'post_password', 'post_name', 'post_content_filtered', 'to_ping', 'pinged', 'post_modified', 'post_modified_gmt', 'post_parent', 'guid', 'menu_order', 'post_mime_type', 'comment_count', 'ancestors', 'filter');
+
 		if(sizeof($results) > 0 && is_array($results) && !is_wp_error($results))
 		{
 			foreach($results as $result)
 			{
-				$pst = get_post($result->ID);
-				if($pst != null)
-				{
-					$post_link = get_permalink($result->ID);
-					$post_thumbnail_id = get_post_thumbnail_id( $pst->ID);
-					if( $post_thumbnail_id > 0)
-					{
-						$thumb = wp_get_attachment_image_src( $post_thumbnail_id, array($size['height'], $size['width']) );
-						$pst->post_image =  (trim($thumb[0]) == "" ? AJAXY_SF_NO_IMAGE : $thumb[0]);
-						$pst->post_image_html = '<img src="'.$pst->post_image.'" width="'.$size['width'].'" height="'.$size['height'].'"/>';
-					}
-					else
-					{
-						if($src = $this->get_image_from_content($pst->post_content, $size['height'], $size['width'])){
-							$pst->post_image = $src['src'] ? $src['src'] : AJAXY_SF_NO_IMAGE;
-							$pst->post_image_html = '<img src="'.$pst->post_image.'" width="'.$src['width'].'" height="'.$src['height'].'" />';
-
-						}
-						else{
-							$pst->post_image = AJAXY_SF_NO_IMAGE;
-							$pst->post_image_html = '';
-						}
-					}
-					if($post_type == "wpsc-product")
-					{
-						if(function_exists('wpsc_calculate_price'))
-						{
-							global $post;
-							$post = $pst;
-							$pst->wpsc_price = wpsc_the_product_price();
-							$pst->wpsc_shipping = strip_tags(wpsc_product_postage_and_packaging());
-							$pst->wpsc_image = wpsc_the_product_image($size['height'], $size['width']);
-						}
-					}
-					$pst->post_author = get_the_author_meta('user_nicename', $pst->post_author);
-					$pst->post_link = $post_link;
-					$pst->post_content = $this->get_text_words($pst->post_content ,(int)$this->get_excerpt_count());
-					$pst->post_date_formatted = date($date_format,  strtotime( $pst->post_date) );
-					foreach($unset_array as $uarr)
-					{
-						unset($pst->{$uarr});
-					}
+				$pst = $this->post_object($result->ID, $term_id);
+				if($pst){
 					$posts[] = $pst; 
 				}
 			}
 		}
 		return $posts;
 	}
-	
+	function posts_by_term($term_id, $limit = 5){
+		$psts = get_posts(array('category' => $term_id, 'numberposts' => $limit));
+		$posts = array();
+		if(sizeof($psts) > 0) {
+			foreach($psts as $p) {
+				$posts[] = $this->post_object($p->ID);
+			}
+		}
+		return $posts;
+	}
+	function post_object($id, $term_id = false) {
+		$unset_array = array('post_type', 'post_date_gmt', 'post_status', 'comment_status', 'ping_status', 'post_password', 'post_name', 'post_content_filtered', 'to_ping', 'pinged', 'post_modified', 'post_modified_gmt', 'post_parent', 'guid', 'menu_order', 'post_mime_type', 'comment_count', 'ancestors', 'filter');
+		$pst = get_post($id);
+		if($term_id) {	
+			if(!in_category($term_id, $pst->ID)){
+				return false;
+			}
+		}
+		$size = array('height' => $this->get_style_setting('thumb_height' , 50), 'width' => $this->get_style_setting('thumb_weight' , 50));
+		if($pst != null)
+		{
+			$post_link = get_permalink($pst->ID);
+			$post_thumbnail_id = get_post_thumbnail_id( $pst->ID);
+			if( $post_thumbnail_id > 0)
+			{
+				$thumb = wp_get_attachment_image_src( $post_thumbnail_id, array($size['height'], $size['width']) );
+				$pst->post_image =  (trim($thumb[0]) == "" ? AJAXY_SF_NO_IMAGE : $thumb[0]);
+				$pst->post_image_html = '<img src="'.$pst->post_image.'" width="'.$size['width'].'" height="'.$size['height'].'"/>';
+			}
+			else
+			{
+				if($src = $this->get_image_from_content($pst->post_content, $size['height'], $size['width'])){
+					$pst->post_image = $src['src'] ? $src['src'] : AJAXY_SF_NO_IMAGE;
+					$pst->post_image_html = '<img src="'.$pst->post_image.'" width="'.$src['width'].'" height="'.$src['height'].'" />';
+
+				}
+				else{
+					$pst->post_image = AJAXY_SF_NO_IMAGE;
+					$pst->post_image_html = '';
+				}
+			}
+			if($post_type == "wpsc-product")
+			{
+				if(function_exists('wpsc_calculate_price'))
+				{
+					global $post;
+					$post = $pst;
+					$pst->wpsc_price = wpsc_the_product_price();
+					$pst->wpsc_shipping = strip_tags(wpsc_product_postage_and_packaging());
+					$pst->wpsc_image = wpsc_the_product_image($size['height'], $size['width']);
+				}
+			}
+			$pst->post_author = get_the_author_meta('user_nicename', $pst->post_author);
+			$pst->post_link = $post_link;
+			$pst->post_content = $this->get_text_words($pst->post_content ,(int)$this->get_excerpt_count());
+			$pst->post_date_formatted = date($date_format,  strtotime( $pst->post_date) );
+			foreach($unset_array as $uarr)
+			{
+				unset($pst->{$uarr});
+			}
+			return $pst;
+		}
+		return false;
+	}
 	function get_text_words($text, $count)
 	{
 		$tr = explode(' ', strip_tags($text));
@@ -516,12 +552,14 @@ class AjaxyLiveSearch {
 		
 		$themes = $this->get_installed_themes(AJAXY_THEMES_DIR, 'themes');
 		$style = AJAXY_SF_PLUGIN_URL."themes/default/style.css";
+		$style_common = AJAXY_SF_PLUGIN_URL."themes/common.css";
 		$theme = $this->get_style_setting('theme');
 		$css = $this->get_style_setting('css');
 		if(isset($themes[$theme])){
 			$style = $themes[$theme]['stylesheet_url'];
 		}
 		?><!-- AJAXY SEARCH V <?php echo AJAXY_SF_VERSION; ?>-->
+		<link rel="stylesheet" type="text/css" href="<?php echo $style_common; ?>" />
 		<link rel="stylesheet" type="text/css" href="<?php echo $style; ?>" />
 		<?php if(trim($css) != ''): ?>
 		<style type="text/css"><?php echo $css; ?></style>
@@ -561,10 +599,21 @@ class AjaxyLiveSearch {
 			$show_post = $this->show_posts();
 			foreach($show_post as $pst_type => $title)
 			{
-				$results[$pst_type]['all'] = ($pst_type == 'category' ? $this->category($_POST['sf_value']) : $this->posts($_POST['sf_value'], $pst_type));
-				$results[$pst_type]['template'] = $this->get_templates($pst_type);
-				$results[$pst_type]['title'] = $title;
-				$results[$pst_type]['class_name'] = ($pst_type == 'category' ? 'sf_category' : 'sf_item');
+				if($pst_type == 'post_category') {
+					$cats = $this->category($_POST['sf_value'], $pst_type);
+					foreach($cats as $key => $val) {
+						$results[$pst_type]['all'] = $val['posts'];
+						$results[$pst_type]['template'] = $this->get_templates($pst_type);
+						$results[$pst_type]['title'] = $val['name'];
+						$results[$pst_type]['class_name'] = 'sf_item';
+					}
+				}
+				else{
+					$results[$pst_type]['all'] = ($pst_type == 'category' || $pst_type == 'post_category' ? $this->category($_POST['sf_value'], $pst_type) : $this->posts($_POST['sf_value'], $pst_type));
+					$results[$pst_type]['template'] = $this->get_templates($pst_type);
+					$results[$pst_type]['title'] = $title;
+					$results[$pst_type]['class_name'] = ($pst_type == 'category' ? 'sf_category' : 'sf_item');
+				}
 			}
 			$results['order'] = $this->show();
 			echo json_encode($results);
@@ -667,6 +716,9 @@ class AjaxyLiveSearch {
 		<div class="sf_search" style="width:'.($width).'px; border:'.$border.'"><span class="sf_block">
 		<input class="sf_input" autocomplete="off" type="text" value="' . (get_search_query() == '' ? $label : get_search_query()). '" name="s" container="'.$id.'"/>
 		<button class="sf_button searchsubmit" type="submit"><span class="sf_hidden">'. esc_attr__('Search') .'</span></button></span></div></div></form></div>';
+		if($this->get_style_setting('credits', 1 ) == 1) {
+			$form = $form.'<a style="display:none" href="http://www.ajaxy.org">Powered by Ajaxy</a>';
+		}
 		$script = '<script type="text/javascript">
 			/* <![CDATA[ */
 			var '.$id.'_timeout = null;

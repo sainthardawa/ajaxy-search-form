@@ -13,6 +13,12 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 	else{
 		$AjaxyLiveSearch->set_style_setting('expand'		, 0);
 	}
+	if(isset($styles['credits'])){
+		$AjaxyLiveSearch->set_style_setting('credits'		, 1);
+	}
+	else{
+		$AjaxyLiveSearch->set_style_setting('credits'		, 0);
+	}
 	if(isset($styles['aspect_ratio'])){
 		$AjaxyLiveSearch->set_style_setting('aspect_ratio'		, 1);
 	}
@@ -171,7 +177,19 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 				<td colspan="2">
 					<textarea style="width:99%; height:150px" name="sf[style][css]" class="regular-text"><?php echo $AjaxyLiveSearch->get_style_setting('css', ''); ?></textarea>
 					<br class="clear"/>
-					<span class="description">Custom styles to be added in the plugin css.</span>
+					<span class="description">Custom styles to be added in the plugin css. add ( .screen-reader-text { display:none; } ) if you want to hide the search form title.</span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<hr class="clear"/>
+	<h3>Credits</h3>
+	<table class="form-table">
+		<tbody>
+			<tr valign="top">
+				<td colspan="2">
+					<input type="checkbox" name="sf[style][credits]" <?php echo  $AjaxyLiveSearch->get_style_setting('credits', 1 ) == 1 ? 'checked="checked"' : ''; ?>/>
+					<span class="description">Author "Powered by" link and credits.</span>
 				</td>
 			</tr>
 		</tbody>

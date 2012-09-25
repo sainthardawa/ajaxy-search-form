@@ -35,6 +35,9 @@ if(!empty($post_type)){
 				if(!empty($_POST['sf_order_results_'.$post_type->name])){
 					$values['order_results'] = trim($_POST['sf_order_results_'.$post_type->name]);
 				}
+				if(!empty($_POST['sf_ushow_'.$post_type->name])){
+					$values['ushow'] = trim($_POST['sf_ushow_'.$post_type->name]);
+				}
 				$AjaxyLiveSearch->set_setting($post_type->name, $values);
 			}
 			$message = "Settings saved";
@@ -103,6 +106,13 @@ if(!empty($post_type)){
 										<option value="post_title desc"<?php echo ($setting['order_results'] == 'post_title desc' ? ' selected="selected"':''); ?>>Title - Descending</option>
 										<option value="post_date asc"<?php echo ($setting['order_results'] == 'post_date asc' ? ' selected="selected"':''); ?>>Date - Ascending</option>
 										<option value="post_date desc"<?php echo ($setting['order_results'] == 'post_date desc' ? ' selected="selected"':''); ?>>Date - Descending</option>
+									</select>
+								</div>
+								<?php else: ?>
+								<div class="misc-pub-section"><label>Show "Posts under Category":</label>
+									<select name="sf_ushow_<?php echo $post_type->name; ?>">
+										<option value="1"<?php echo ($setting['ushow'] == 1 ? ' selected="selected"':''); ?>>Show</option>
+										<option value="0"<?php echo ($setting['ushow'] == 0 ? ' selected="selected"':''); ?>>hide</option>
 									</select>
 								</div>
 								<?php endif; ?>
