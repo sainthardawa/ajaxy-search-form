@@ -1,9 +1,9 @@
-::-webkit-scrollbar {
+#sf_sb ::-webkit-scrollbar {
 	height: 10px;
 	overflow: visible;
 	width: 13px;
 }
-::-webkit-scrollbar-thumb {
+#sf_sb ::-webkit-scrollbar-thumb {
 	background-color: rgba(0, 0, 0, .2);
 	background-clip: padding-box;
 	border: solid transparent;
@@ -12,20 +12,28 @@
 	padding: 100px 0 0;
 	box-shadow: inset 1px 1px 0 rgba(0, 0, 0, .1),inset 0 -1px 0 rgba(0, 0, 0, .07);
 }
-::-webkit-scrollbar-button {
+#sf_sb ::-webkit-scrollbar-button {
 	height: 0;
 	width: 0;
 }
-::-webkit-scrollbar-track {
+#sf_sb ::-webkit-scrollbar-track {
 	background-clip: padding-box;
 	border: solid transparent;
 	border-width: 0 0 0 4px;
 }
-::-webkit-scrollbar-corner {
+#sf_sb ::-webkit-scrollbar-corner {
 	background: transparent;
 }
 .sf_result_container {
 	max-height:200px;
 	overflow:auto;
 	margin-bottom:5px;
+}
+.sf_search
+{	
+	position:relative;
+	display:inline-block;
+}
+.screen-reader-text {
+	display:block;
 }

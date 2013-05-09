@@ -6,7 +6,7 @@
 	Plugin Name: Ajaxy Live Search
 	Plugin URI: http://ajaxy.org
 	Description: Transfer wordpress form into an advanced ajax search form the same as facebook live search, This version supports themes and can work with almost all themes without any modifications
-	Version: 2.1.5
+	Version: 2.1.6
 	Author: Ajaxy Team
 	Author URI: http://www.ajaxy.org
 	License: GPLv2 or later
@@ -14,10 +14,10 @@
 
 
 
-define('AJAXY_SF_VERSION', '2.1.5');
+define('AJAXY_SF_VERSION', '2.1.6');
 define('AJAXY_SF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define('AJAXY_THEMES_DIR', dirname(__FILE__)."/themes/");
-define( 'AJAXY_SF_NO_IMAGE', plugin_dir_url( __FILE__ ) ."themes/default/images/no-image.gif");
+define('AJAXY_SF_NO_IMAGE', plugin_dir_url( __FILE__ ) ."themes/default/images/no-image.gif");
 
 require_once('widgets/search.php');
 	
@@ -103,6 +103,7 @@ class AjaxyLiveSearch {
 				<li class="active"><a href="<?php echo menu_page_url('ajaxy_sf_admin', false).'&tab=themes'; ?>" class="<?php echo ($tab == 'themes' ? 'current' : ''); ?>">Themes<span class="count"></span></a> |</li>
 				<li class="active"><a href="<?php echo menu_page_url('ajaxy_sf_admin', false).'&tab=preview'; ?>" class="<?php echo ($tab == 'preview' ? 'current' : ''); ?>">Preview<span class="count"></span></a></li>
 			</ul>
+			<hr style="clear:both; display:block"/>
 			<form action="" method="post">
 			<?php wp_nonce_field(); ?>
 			<?php if($tab == 'templates'): ?>
@@ -186,12 +187,7 @@ class AjaxyLiveSearch {
 						</p>
 						</td>
 						<td>
-						<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-							<input type="hidden" name="cmd" value="_s-xclick">
-							<input type="hidden" name="hosted_button_id" value="THNE9CQKJDETS">
-							<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-							<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
-						</form>
+						<a target="_blank" href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&amp;hosted_button_id=BGT78F6QUJC42"><img class="aligncenter size-full wp-image-180" title="btn_donateCC_LG" alt="" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" width="147" height="47"></a>
 						</td>
 					</tr>
 				</table>
@@ -397,18 +393,23 @@ class AjaxyLiveSearch {
 	function category($name, $pst_type = 'category', $limit = 5)
 	{
 		global $wpdb, $sitepress;
-		$wpml_lang_code = (defined('ICL_LANGUAGE_CODE') ? ICL_LANGUAGE_CODE: ''); 
+
 		$categories = array();
 		$setting = (object)$this->get_setting($pst_type);
-		$excludes = (isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes) ? " AND $wpdb->terms.term_id NOT IN (".implode(',', $setting->excludes).")" : "");
+
+		$excludes = "";
+		$excludes_array = array();
+		if(isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes)){
+			$excludes = " AND $wpdb->terms.term_id NOT IN (".implode(',', $setting->excludes).")";
+			$excludes_array = $setting->excludes;
+		}
 		$results = null;
-		if($wpml_lang_code != ''){
-			$query = $wpdb->prepare("select * from (select distinct($wpdb->terms.name), $wpdb->terms.term_id,  $wpdb->term_taxonomy.taxonomy,  $wpdb->term_taxonomy.term_taxonomy_id from $wpdb->terms, $wpdb->term_taxonomy where name like '%%%s%%' and $wpdb->term_taxonomy.taxonomy<>'link_category' and $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id $excludes limit 0, ".$setting->limit.") as c, ".$wpdb->prefix."icl_translations as i where c.term_taxonomy_id = i.element_id and i.language_code = %s and SUBSTR(i.element_type, 1, 4)='tax_' group by c.term_id",  $name, $wpml_lang_code);
-			$results = $wpdb->get_results( $query );
-		}
-		else {
-			$results = $wpdb->get_results($wpdb->prepare("select distinct($wpdb->terms.name), $wpdb->terms.term_id,  $wpdb->term_taxonomy.taxonomy from $wpdb->terms, $wpdb->term_taxonomy where name like '%%%s%%' and $wpdb->term_taxonomy.taxonomy<>'link_category' and $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id $excludes limit 0, ".$setting->limit,  $name));
-		}
+		
+		$query = "select distinct($wpdb->terms.name), $wpdb->terms.term_id,  $wpdb->term_taxonomy.taxonomy from $wpdb->terms, $wpdb->term_taxonomy where name like '%%%s%%' and $wpdb->term_taxonomy.taxonomy<>'link_category' and $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id $excludes limit 0, %d";
+		$query = apply_filters("sf_category_query", $wpdb->prepare($query,  $name, $setting->limit), $name, $excludes_array, $setting->limit);
+
+		$results = $wpdb->get_results($query);
+
 		if(sizeof($results) > 0 && is_array($results) && !is_wp_error($results))
 		{
 			$unset_array = array('term_group', 'term_taxonomy_id', 'taxonomy', 'parent', 'count', 'cat_ID', 'cat_name', 'category_parent');
@@ -441,20 +442,21 @@ class AjaxyLiveSearch {
 	function posts($name, $post_type='post', $term_id = false)
 	{
 		global $wpdb;
-		$wpml_lang_code = (defined('ICL_LANGUAGE_CODE') ? ICL_LANGUAGE_CODE: '');
 		$posts = array();
 		
 		$setting = (object)$this->get_setting($post_type);
-		$excludes = (isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes) ? " AND ID NOT IN (".implode(',', $setting->excludes).")" : "");
+		$excludes = "";
+		$excludes_array = array();
+		if(isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes)){
+			$excludes = " AND $wpdb->terms.term_id NOT IN (".implode(',', $setting->excludes).")";
+			$excludes_array = $setting->excludes;
+		}
 		$order_results = (isset($setting->order_results) ? " order by ".$setting->order_results : "");
 		$results = array();
-		if($wpml_lang_code != ''){
-			$query = $wpdb->prepare("select * from (select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($setting->search_content == 1 ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes $order_results limit 0,".$setting->limit.") as p, ".$wpdb->prefix."icl_translations as i where p.ID = i.element_id and i.language_code = %s group by p.ID",  ($setting->search_content == true ? array($name, $name):$name), $wpml_lang_code);
-			$results = $wpdb->get_results( $query );
-		}
-		else{
-			$results = $wpdb->get_results( $wpdb->prepare("select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($setting->search_content == 1 ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes $order_results limit 0,".$setting->limit,  ($setting->search_content == true ? array($name, $name):$name)));
-		}
+		$query = "select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($setting->search_content == 1 ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes $order_results limit 0, %d";
+		$query = apply_filters("sf_posts_query", $wpdb->prepare($query,  ($setting->search_content == true ? array($name, $name):$name), $setting->limit), $name, $post_type, $excludes_array, $setting->search_content, $setting->order_results, $setting->limit);
+		
+		$results = $wpdb->get_results( $query );
 		$date_format = get_option( 'date_format' );
 
 		if(sizeof($results) > 0 && is_array($results) && !is_wp_error($results))
@@ -521,14 +523,16 @@ class AjaxyLiveSearch {
 					$pst->wpsc_image = wpsc_the_product_image($size['height'], $size['width']);
 				}
 			}
+			$pst->post_title = get_the_title($pst->ID);
 			$pst->post_author = get_the_author_meta('user_nicename', $pst->post_author);
 			$pst->post_link = $post_link;
-			$pst->post_content = $this->get_text_words($pst->post_content ,(int)$this->get_excerpt_count());
+			$pst->post_content = $this->get_text_words(get_the_content($pst->ID) ,(int)$this->get_excerpt_count());
 			$pst->post_date_formatted = date($date_format,  strtotime( $pst->post_date) );
 			foreach($unset_array as $uarr)
 			{
 				unset($pst->{$uarr});
 			}
+			$pst = apply_filters('sf_post', $pst);
 			return $pst;
 		}
 		return false;
@@ -572,23 +576,29 @@ class AjaxyLiveSearch {
 		$script = '
 		<script type="text/javascript">
 			/* <![CDATA[ */
-				var sf_expand = '.$this->get_style_setting('expand', 'false').';
 				var sf_position = '.$this->get_style_setting('results_position', 0).';
-				var sf_delay = '.$this->get_style_setting('delay', 500).';
-				var sf_width = '.$this->get_style_setting('width', 180).';
-				var sf_swidth = '.$this->get_style_setting('results_width', 315).';
 				var sf_templates = '.json_encode($this->get_templates('more')).';
-				var sf_ajaxurl = "'.admin_url('admin-ajax.php').(defined('ICL_LANGUAGE_CODE') ? '?lang='.ICL_LANGUAGE_CODE: '').'";
-				var sf_defaultText = "'.$label.'";
-				var sf_url = "'.str_replace('"', '\"', $this->get_style_setting('search_url',  home_url().'/?s=%s')).'";
+				var sf_input = "'.$this->get_style_setting('input_id', '.sf_input').'";
+				jQuery(document).ready(function(){
+					jQuery(sf_input).ajaxyLiveSearch({expand: '.$this->get_style_setting('expand', 'false').', searchUrl: "'.str_replace('"', '\"', $this->get_style_setting('search_url',  home_url().'/?s=%s')).'", text: "'.$label.'", delay:'.$this->get_style_setting('delay', 500).', iwidth:'.$this->get_style_setting('width', 180).', width:'.$this->get_style_setting('results_width', 315).', ajaxUrl:"'.$this->get_ajax_url().'"});
+				});
 			/* ]]> */
 		</script>';
 		echo $script.'<script src="'.$x.'" type="text/javascript"></script>
 		<!-- END -->';
 	}
+	function get_ajax_url(){
+		if(defined('ICL_LANGUAGE_CODE')){
+			return admin_url('admin-ajax.php').'?lang='.ICL_LANGUAGE_CODE;
+		}
+		if(function_exists('qtrans_getLanguage')){
+
+			return admin_url('admin-ajax.php').'?lang='.qtrans_getLanguage();
+		}
+		return admin_url('admin-ajax.php');
+	}
 	function footer()
 	{
-
 		echo $script;
 	}
 	function get_search_results()
@@ -709,34 +719,55 @@ class AjaxyLiveSearch {
 		if($expand){
 			$width = $expand;
 		}
-		$id = uniqid('sf_');
 		$border = $this->get_style_setting('border-width', '1') . "px " . $this->get_style_setting('border-type', 'solid') . " #" .$this->get_style_setting('border-color', 'dddddd');
-		$form = '<!-- Ajaxy Search Form v'.AJAXY_SF_VERSION.' --><div class="sf_container" id="'.$id.'"><form role="search" method="get" id="searchform" class="searchform" action="' . home_url( '/' ) . '" >
+		$form = '<!-- Ajaxy Search Form v'.AJAXY_SF_VERSION.' --><div class="sf_container">
+		<form role="search" method="get" class="searchform" action="' . home_url( '/' ) . '" >
 		<div><label class="screen-reader-text" for="s">' . __('Search for:') . '</label>
-		<div class="sf_search" style="width:'.($width).'px; border:'.$border.'"><span class="sf_block">
-		<input class="sf_input" autocomplete="off" type="text" value="' . (get_search_query() == '' ? $label : get_search_query()). '" name="s" container="'.$id.'"/>
-		<button class="sf_button searchsubmit" type="submit"><span class="sf_hidden">'. esc_attr__('Search') .'</span></button></span></div></div></form></div>';
+		<div class="sf_search" style="border:'.$border.'"><span class="sf_block">
+		<input style="width:'.($width).'px;" class="sf_input" autocomplete="off" type="text" value="' . (get_search_query() == '' ? $label : get_search_query()). '" name="s"/>
+		<button class="sf_button searchsubmit" type="submit"><span class="sf_hidden">'. esc_attr__('Search') .'</span></button></span></div></div></form></div><input class="sf_input" autocomplete="off" type="text" value="' . (get_search_query() == '' ? $label : get_search_query()). '" name="s" container="'.$id.'"/><input class="sf_input" autocomplete="off" type="text" value="' . (get_search_query() == '' ? $label : get_search_query()). '" name="s" container="'.$id.'"/><input class="sf_input" autocomplete="off" type="text" value="' . (get_search_query() == '' ? $label : get_search_query()). '" name="s" container="'.$id.'"/>';
 		if($this->get_style_setting('credits', 1 ) == 1) {
 			$form = $form.'<a style="display:none" href="http://www.ajaxy.org">Powered by Ajaxy</a>';
 		}
-		$script = '<script type="text/javascript">
-			/* <![CDATA[ */
-			var '.$id.'_timeout = null;
-			jQuery("#'.$id.' .sf_input").keyup(function(event){
-				if(event.keyCode != "38" && event.keyCode != "40" && event.keyCode != "13" && event.keyCode != "27" && event.keyCode != "39" && event.keyCode != "37")
-				{
-					if('.$id.'_timeout != null)
-					{
-						clearTimeout('.$id.'_timeout);
-					}
-					jQuery("#'.$id.' .sf_input").attr("class", jQuery("#'.$id.' .sf_input").attr("class").replace(" sf_focused", "") + " sf_focused");
-					sf_timeout = setTimeout("sf_get_results(\''.$id.'\')", sf_delay);
-				}
-			});
-		/* ]]> */
-		</script>';
-		return $form.$script;
+		return $form;
 	}
+}
+add_filter('sf_category_query', 'sf_category_query', 4, 10);
+function sf_category_query($query, $search, $excludes, $limit){
+	global $wpdb;
+	$wpml_lang_code = (defined('ICL_LANGUAGE_CODE') ? ICL_LANGUAGE_CODE: false);
+	if(	$wpml_lang_code ) {
+		if(sizeof($excludes) > 0){
+			$excludes = " AND $wpdb->terms.term_id NOT IN (".implode(",", $excludes).")";
+		}
+		else{
+			$excludes = "";
+		}
+		$query = "select * from (select distinct($wpdb->terms.name), $wpdb->terms.term_id,  $wpdb->term_taxonomy.taxonomy,  $wpdb->term_taxonomy.term_taxonomy_id from $wpdb->terms, $wpdb->term_taxonomy where name like '%%%s%%' and $wpdb->term_taxonomy.taxonomy<>'link_category' and $wpdb->term_taxonomy.term_id = $wpdb->terms.term_id $excludes limit 0, ".$limit.") as c, ".$wpdb->prefix."icl_translations as i where c.term_taxonomy_id = i.element_id and i.language_code = %s and SUBSTR(i.element_type, 1, 4)='tax_' group by c.term_id";
+		return $wpdb->prepare($query,  $search, $wpml_lang_code);
+	}
+	return $query;
+}
+add_filter('sf_posts_query', 'sf_posts_query', 5, 10);
+function sf_posts_query($query, $search, $post_type, $excludes, $search_content, $order_results, $limit){
+	global $wpdb;
+	$wpml_lang_code = (defined('ICL_LANGUAGE_CODE') ? ICL_LANGUAGE_CODE: false);
+	if(	$wpml_lang_code ) {
+		if(sizeof($excludes) > 0){
+			$excludes = " AND $wpdb->terms.term_id NOT IN (".implode(",", $excludes).")";
+		}
+		else{
+			$excludes = "";
+		}
+		$order_results = (!empty($order_results) ? " order by ".$order_results : "");
+		$query = $wpdb->prepare("select * from (select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($search_content == true ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes $order_results limit 0,".$limit.") as p, ".$wpdb->prefix."icl_translations as i where p.ID = i.element_id and i.language_code = %s group by p.ID",  ($search_content == true ? array($search, $search):$search), $wpml_lang_code);
+		return $query;
+	}
+	return $query;
+}
+add_filter('sf_post', 'sf_post', 1);
+function sf_post($pst){
+	return $pst;
 }
 function ajaxy_search_form($form = '')
 {
@@ -745,5 +776,6 @@ function ajaxy_search_form($form = '')
 }
 global $AjaxyLiveSearch;
 $AjaxyLiveSearch = new AjaxyLiveSearch();
+
 
 ?>

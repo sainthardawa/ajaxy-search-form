@@ -6,6 +6,7 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 	$styles = $_POST['sf']['style'];
 	$templates = $_POST['sf']['template'];
 	$AjaxyLiveSearch->set_style_setting('search_label'	, $styles['label']); 
+	$AjaxyLiveSearch->set_style_setting('input_id'	, $styles['input_id']); 
 	$AjaxyLiveSearch->set_style_setting('width'			, (int)$styles['width']);
 	if(isset($styles['allow_expand'])){
 		$AjaxyLiveSearch->set_style_setting('expand'		, (int)$styles['expand']);
@@ -42,9 +43,7 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 <?php if ( $message ) : ?>
 <div id="message" class="updated"><p><?php echo $message; ?></p></div>
 <?php endif; ?>
-<br class="clear" />
 <div class="wrap">
-	<hr class="clear"/>
 	<h3>Search Form box</h3>
 	<table class="form-table">
 		<tbody>
@@ -53,6 +52,13 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 				<td>
 					<input type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('search_label',  _('Search')); ?>" name="sf[style][label]" class="regular-text">
 					<span class="description">This label appears inside the search form and will be hidden when the user clicks inside.</span>
+				</td>
+			</tr>
+			<tr valign="top">
+				<th scope="row"><label>Search Input ID or class name</label></th>
+				<td>
+					<input type="text" value="<?php echo  $AjaxyLiveSearch->get_style_setting('input_id',  ""); ?>" name="sf[style][input_id]" class="regular-text">
+					<span class="description">keep this blank to use ajaxy search form, or else put the id of the search or the class name in the form (#ID for id (# before the id) or else (.className) ( "." before the className).</span>
 				</td>
 			</tr>
 			<tr valign="top">
@@ -105,7 +111,7 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 			
 		</tbody>
 	</table>
-	<hr class="clear"/>
+	<hr/>
 	<h3>Search Results box</h3>
 	<table class="form-table">
 		<tbody>
@@ -149,7 +155,7 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 			</tr>
 		</tbody>
 	</table>
-	<hr class="clear"/>
+	<hr/>
 	<h3>More results box</h3>
 	<table class="form-table">
 		<tbody>
@@ -169,7 +175,7 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 			</tr>
 		</tbody>
 	</table>
-	<hr class="clear"/>
+	<hr/>
 	<h3>Custom styles (<a href="http://www.w3schools.com/css/css_syntax.asp" target="_blank" rel="nofollow">CSS</a>)</h3>
 	<table class="form-table">
 		<tbody>
@@ -182,7 +188,7 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 			</tr>
 		</tbody>
 	</table>
-	<hr class="clear"/>
+	<hr/>
 	<h3>Credits</h3>
 	<table class="form-table">
 		<tbody>
