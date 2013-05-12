@@ -6,7 +6,7 @@
 	Plugin Name: Ajaxy Live Search
 	Plugin URI: http://ajaxy.org
 	Description: Transfer wordpress form into an advanced ajax search form the same as facebook live search, This version supports themes and can work with almost all themes without any modifications
-	Version: 2.1.7
+	Version: 2.1.8
 	Author: Ajaxy Team
 	Author URI: http://www.ajaxy.org
 	License: GPLv2 or later
@@ -14,7 +14,7 @@
 
 
 
-define('AJAXY_SF_VERSION', '2.1.7');
+define('AJAXY_SF_VERSION', '2.1.8');
 define('AJAXY_SF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define('AJAXY_THEMES_DIR', dirname(__FILE__)."/themes/");
 define('AJAXY_SF_NO_IMAGE', plugin_dir_url( __FILE__ ) ."themes/default/images/no-image.gif");
@@ -578,7 +578,7 @@ class AjaxyLiveSearch {
 			/* <![CDATA[ */
 				var sf_position = '.$this->get_style_setting('results_position', 0).';
 				var sf_templates = '.json_encode($this->get_templates('more')).';
-				var sf_input = "'.$this->get_style_setting('input_id', '.sf_input').'";
+				var sf_input = "'.(trim($this->get_style_setting('input_id', '.sf_input')) == "" ? '.sf_input' : $this->get_style_setting('input_id', '.sf_input')).'";
 				jQuery(document).ready(function(){
 					jQuery(sf_input).ajaxyLiveSearch({expand: '.$this->get_style_setting('expand', 'false').', searchUrl: "'.str_replace('"', '\"', $this->get_style_setting('search_url',  home_url().'/?s=%s')).'", text: "'.$label.'", delay:'.$this->get_style_setting('delay', 500).', iwidth:'.$this->get_style_setting('width', 180).', width:'.$this->get_style_setting('results_width', 315).', ajaxUrl:"'.$this->get_ajax_url().'"});
 				});
