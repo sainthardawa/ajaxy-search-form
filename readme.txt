@@ -1,11 +1,11 @@
 === Plugin Name ===
 Contributors: n-for-all
 Donate link: http://ajaxy.org/
-Version: 2.1.8
+Version: 2.1.9
 Tags: facebook, live-search, ajax-search, category-search
 Requires at least: 3.0.0
 Tested up to: 3.4.1
-Stable tag: 2.1.8
+Stable tag: 2.1.9
 
 A facebook like ajaxy live search for wordpress, this plugin uses the same functionality as facebook to retrieve the results from your blog.
 
@@ -45,6 +45,10 @@ Each theme has its own styles, email me at icu090@gmail.com and i will fix it ri
 2. screenshot-2.png
 
 == Changelog ==
+
+= 2.1.9 =
+
+* fix for content search
 
 = 2.1.6 =
 

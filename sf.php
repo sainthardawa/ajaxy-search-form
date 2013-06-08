@@ -6,7 +6,7 @@
 	Plugin Name: Ajaxy Live Search
 	Plugin URI: http://ajaxy.org
 	Description: Transfer wordpress form into an advanced ajax search form the same as facebook live search, This version supports themes and can work with almost all themes without any modifications
-	Version: 2.1.8
+	Version: 2.1.9
 	Author: Ajaxy Team
 	Author URI: http://www.ajaxy.org
 	License: GPLv2 or later
@@ -14,7 +14,7 @@
 
 
 
-define('AJAXY_SF_VERSION', '2.1.8');
+define('AJAXY_SF_VERSION', '2.1.9');
 define('AJAXY_SF_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define('AJAXY_THEMES_DIR', dirname(__FILE__)."/themes/");
 define('AJAXY_SF_NO_IMAGE', plugin_dir_url( __FILE__ ) ."themes/default/images/no-image.gif");
@@ -266,7 +266,7 @@ class AjaxyLiveSearch {
 			$setting = $this->get_setting($post_type->name);
 			if($setting -> show == 1)
 			{
-			$show_posts[$post_type->name] = $setting->order;
+				$show_posts[$post_type->name] = $setting->order;
 			}
 		}
 		$scat = (array)$this->get_setting('category');
@@ -443,19 +443,22 @@ class AjaxyLiveSearch {
 	{
 		global $wpdb;
 		$posts = array();
-		
 		$setting = (object)$this->get_setting($post_type);
+		
 		$excludes = "";
 		$excludes_array = array();
 		if(isset($setting->excludes) && sizeof($setting->excludes) > 0 && is_array($setting->excludes)){
 			$excludes = " AND $wpdb->terms.term_id NOT IN (".implode(',', $setting->excludes).")";
 			$excludes_array = $setting->excludes;
 		}
+		
 		$order_results = (isset($setting->order_results) ? " order by ".$setting->order_results : "");
 		$results = array();
-		$query = "select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($setting->search_content == 1 ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes $order_results limit 0, %d";
-		$query = apply_filters("sf_posts_query", $wpdb->prepare($query,  ($setting->search_content == true ? array($name, $name):$name), $setting->limit), $name, $post_type, $excludes_array, $setting->search_content, $setting->order_results, $setting->limit);
 		
+		$query = "select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($setting->search_content == 1 ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes $order_results limit 0, %d";
+
+		$query = apply_filters("sf_posts_query", ($setting->search_content == 1 ? $wpdb->prepare($query, $name, $name, $setting->limit) :$wpdb->prepare($query, $name, $setting->limit)), $name, $post_type, $excludes_array, $setting->search_content, $setting->order_results, $setting->limit);
+
 		$results = $wpdb->get_results( $query );
 		$date_format = get_option( 'date_format' );
 
@@ -760,7 +763,7 @@ function sf_posts_query($query, $search, $post_type, $excludes, $search_content,
 			$excludes = "";
 		}
 		$order_results = (!empty($order_results) ? " order by ".$order_results : "");
-		$query = $wpdb->prepare("select * from (select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($search_content == true ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes $order_results limit 0,".$limit.") as p, ".$wpdb->prefix."icl_translations as i where p.ID = i.element_id and i.language_code = %s group by p.ID",  ($search_content == true ? array($search, $search):$search), $wpml_lang_code);
+		$query = $wpdb->prepare("select * from (select $wpdb->posts.ID from $wpdb->posts where (post_title like '%%%s%%' ".($search_content == true ? "or post_content like '%%%s%%')":")")." and post_status='publish' and post_type='".$post_type."' $excludes $order_results limit 0,".$limit.") as p, ".$wpdb->prefix."icl_translations as i where p.ID = i.element_id and i.language_code = %s group by p.ID",  ($search_content == true ? array($search, $search, $wpml_lang_code): array($search, $wpml_lang_code)));
 		return $query;
 	}
 	return $query;
