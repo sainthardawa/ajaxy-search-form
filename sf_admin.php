@@ -29,6 +29,7 @@ if(isset($_POST['sf_submit']) && wp_verify_nonce($_POST['_wpnonce'])){
 	$AjaxyLiveSearch->set_style_setting('delay'			, (int)$styles['delay']);
 	$AjaxyLiveSearch->set_style_setting('border-width' 	, (int)$styles['b_width']);
 	$AjaxyLiveSearch->set_style_setting('border-type'	, $styles['b_type']);
+	$AjaxyLiveSearch->set_style_setting('search_url'	, $styles['url']);
 	$AjaxyLiveSearch->set_style_setting('border-color'	, $styles['b_color']);
 	$AjaxyLiveSearch->set_style_setting('results_width'	, (int)$styles['results_width']); 
 	$AjaxyLiveSearch->set_style_setting('excerpt' 		, $styles['excerpt']);
